@@ -1,6 +1,6 @@
 /*
 京东App首页-领金豆-抽金豆
-13 7,8  * * * Sami_jd_SoyBean.js
+cron 13 7,8  * * * https://github.com/qionger0220/Sami/edit/main/Sami_jd_SoyBean.js
  */
 const $ = new Env('Sami抽京豆');
 //Node.js用户请在jdCookie.js处填写京东ck;
