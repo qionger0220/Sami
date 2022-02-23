@@ -2,7 +2,7 @@
 京东极速App首页-百元生活费-发财挖宝
 13 7,8 * * * rhy_jd_fcwb.js
  */
-const $ = new Env('发财挖宝');
+const $ = new Env('Sami发财挖宝');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 const notify = $.isNode() ? require('./sendNotify') : '';
