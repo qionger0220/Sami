@@ -56,7 +56,7 @@ if ($.isNode()) {
                 $.requireCount=vo.requireCount;
                 $.taskType=vo.taskType;
                 //console.log($.panelSubtitle);
-                
+               
                 if($.taskType===1){ //立得0.1元任务*****************************
                     if($.innerStatus === 7){
                         console.log("立得0.1元任务领取成功");
