@@ -1,9 +1,8 @@
 /*
-#鲤鱼红包
 京东App首页-鲤鱼红包
-13 7,8  * * * rhy_jd_lyhb.js
- */
-const $ = new Env('鲤鱼红包');
+13 7,8  * * * Sami_jd_lyhb.js
+*/
+const $ = new Env('Sami鲤鱼红包');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 const notify = $.isNode() ? require('./sendNotify') : '';
