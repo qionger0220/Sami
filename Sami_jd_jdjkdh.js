@@ -4,6 +4,7 @@
 1 0 * * * Sami_jd_jdjkdh.js
  */
  /*
+ 更新时间：2022-02-24
  拉库地址 https://github.com/qionger0220/Sami.git "jd_|jx_|jdCookie"
  */
 const $ = new Env('Sami东东健康社区兑换');
