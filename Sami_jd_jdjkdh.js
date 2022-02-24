@@ -1,7 +1,7 @@
 /*
 #东东健康社区兑换
 京东App首页-东东健康社区兑换
-1 0  * * * Sami_jd_jdjkdh.js
+1 0 * * * Sami_jd_jdjkdh.js
  */
  /*
  拉库地址 https://github.com/qionger0220/Sami.git "jd_|jx_|jdCookie"
