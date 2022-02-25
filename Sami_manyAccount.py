@@ -7,7 +7,7 @@
 new Env('Sami 青龙面板多开');
 '''
 '''
-1 1 1 1 1 Sami_jd_fcwb.js
+10 7,8 * * * Sami_jd_lyhb.js
 '''
 
 import socket
