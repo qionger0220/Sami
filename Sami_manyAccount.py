@@ -6,9 +6,6 @@
 '''
 new Env('Sami 青龙面板多开');
 '''
-'''
-10 7,8 * * * Sami_jd_lyhb.js
-'''
 
 import socket
 import base64
@@ -55,6 +52,18 @@ def sami_login():
         with open(path,"w") as file:   #”w"代表着每次运行都覆盖内容
             file.write(str('{"username":"'+ str(username)+'","password":"'+ str(password)+ '","token":"'+str(token)+'","tokens":{"desktop":"'+str(tokens)+'"},"lastlogon":'+str(lastlogon)+',"retries":'+str(retries)+',"lastip":"'+str(lastip)+'","lastaddr":"'+str(lastaddr)+'","sami_token":"'+str(sami_token)+'","platform":"'+str(platform)+'","isTwoFactorChecking":'+str(isTwoFactorChecking).lower()+'}'))
 
+def get_qx():
+    if "sami_dk" in os.environ:
+        sami_dk = os.environ['sami_dk']
+        #logger.info(sami_dk)
+        if(sami_dk.lower() == "true"):
+            sami_login()
+        else:
+            logger.info("禁止多开账号启动")
+    else:
+        logger.info("未添加sami_dk变量,设置 sami_dk 为 true 青龙多开账号启动")
+        sys.exit(0)
+
 if __name__ == '__main__':
     logger.info("\n--------------------\n")
-    sami_login()
+    get_qx()
