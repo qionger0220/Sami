@@ -237,7 +237,7 @@ function GetAllTask() {
                         //console.log(data.data.result.taskInfos);
 
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -289,7 +289,7 @@ function Stand0_1yuan() {
                         }
                             
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -324,7 +324,7 @@ function Stand0_1yuanDoTask() {
                     if (data) {
                         data = JSON.parse(data);
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -358,7 +358,7 @@ function Stand0_1yuanOverTask() {
                     if (data) {
                         data = JSON.parse(data);
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -394,7 +394,7 @@ function Stand0_1yuanGetRedPaper() {
                         //strPrizeName ＝ 文本_取出中间文本 (信息返回1, “biz_msg” ＋ #引号 ＋ “:” ＋ #引号, #引号)
                             $.log(`立得0.1任务领红包: ` + data.data.biz_msg);
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -442,7 +442,7 @@ function Get3Coupons() {
                             $.log(`领三张券任务: 获取数据为空`);
                         }
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -487,7 +487,7 @@ function Get1DoTask() {
                             $.log(`逛活动任务: ` + data.data.biz_msg);
                         }    
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -531,7 +531,7 @@ function Get1_1DoTask() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -575,7 +575,7 @@ function Get1_2DoTask(id1) {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -619,7 +619,7 @@ function Get1_3GetHB() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -663,7 +663,7 @@ function Get2DoTask() {
                             $.log(`逛互动任务: ` + data.data.biz_msg);
                         }    
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -707,7 +707,7 @@ function Get2_1DoTask() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -751,7 +751,7 @@ function Get2_2DoTask(id1) {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -795,7 +795,7 @@ function Get2_3GetHB() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -839,7 +839,7 @@ function Get3DoTask() {
                             $.log(`逛频道任务: ` + data.data.biz_msg);
                         }    
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -883,7 +883,7 @@ function Get3_1DoTask() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -928,7 +928,7 @@ function Get3_2DoTask(id1) {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -972,7 +972,7 @@ function Get3_3GetHB() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -1016,7 +1016,7 @@ function Get4DoTask() {
                             $.log(`逛店铺任务: ` + data.data.biz_msg);
                         }    
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -1060,7 +1060,7 @@ function Get4_1DoTask() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -1105,7 +1105,7 @@ function Get4_2DoTask(id1) {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -1149,7 +1149,7 @@ function Get4_3GetHB() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -1193,7 +1193,7 @@ function Get5DoTask() {
                             $.log(`逛店铺任务: ` + data.data.biz_msg);
                         }    
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -1237,7 +1237,7 @@ function Get5_1DoTask() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -1282,7 +1282,7 @@ function Get5_2DoTask(id1) {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -1326,7 +1326,7 @@ function Get5_3GetHB() {
                                 
                             //}
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
@@ -1363,9 +1363,9 @@ function SoyBean() {
                 } else {
                     if (data) {
                         data = JSON.parse(data);
-                            $.log(`京豆抽奖: ` + data.promptMsg);
+                            $.log(`豆抽奖: ` + data.promptMsg);
                     } else {
-                        console.log(`京东服务器返回空数据`)
+                        console.log(`服务器返回空数据`)
                     }
                 }
             } catch (e) {
