@@ -42,21 +42,41 @@ if ($.isNode()) {
             //console.log(data.data.result.taskInfos)
         	for (let vo of data.data.result.taskInfos) {
 			    if(vo.type===4){//逛商品
-			        if(vo.doTimes < vo.times){
-			           console.log('123') 
-			           let body='body=%7B%22type%22%3A4%2C%22taskInfo%22%3A%2213560172%22%7D&build=167945&client=apple&clientVersion=10.3.4&d_brand=apple&d_model=iPhone13%2C1&ef=1&eid=eidIc98d812270s8YJsI7x6OQ4SE/oNrRYKmoGCbCm002iJf1jMsFpgLxu2RGdxkRDEZNU1pWW0cvbGnPi%2Bhmydl%2BleT3quEAT%2B6VnQbdtggDOcLcrAx&ep=%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22screen%22%3A%22CJOyDIeyDNC2%22%2C%22wifiBssid%22%3A%22Y2GmDzC4CNZwCNTvEWDsCzUnEJLvCQCnDNCzYWUzD2Y%3D%22%2C%22osVersion%22%3A%22CJUkCM4y%22%2C%22area%22%3A%22CJTpEJK0XzumDV81CNYmCG%3D%3D%22%2C%22openudid%22%3A%22ZwTwDNS0DtKzDwS3CtYnY2Y2ZJHsCzLwYJYzDNC0ZtunCzTwZJVwZG%3D%3D%22%2C%22uuid%22%3A%22aQf1ZRdxb2r4ovZ1EJZhcxYlVNZSZz09%22%7D%2C%22ts%22%3A1646096034%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D&ext=%7B%22prstate%22%3A%220%22%2C%22pvcStu%22%3A%221%22%7D&isBackground=N&joycious=59&lang=zh_CN&networkType=wifi&networklibtype=JDNetworkBaseAF&partner=apple&rfs=0000&scope=11&sign=017555a9f5871bee853eec93d3e1cfa9&st=1646112734684&sv=122&uemps=0-1&uts=0f31TVRjBSsqndu4/jgUPz6uymy50MQJQK5a1ZM5c4AnvMg/N1eSzpgBG6HTznJvnzecGU5FVxAXmn/nR9zJLQvRVo0xxWwJaHWjLYByGcyB%2BNiYllicLPUbc8shJWAghQzzvkhe5xXmnBvW3rK5mhGl%2B2juxLxYAvwavtQ%2BX6Uvr6WfeNZHUOCiT1KZcHHy0yYMbWeHKEr6ZW7VV4tnkg%3D%3D';
-			           await doTask(body);
-			           await $.wait(6000);
+    			    let body='body=%7B%22type%22%3A4%2C%22taskInfo%22%3A%2210025072089962%22%7D&build=167945&client=apple&clientVersion=10.3.4&d_brand=apple&d_model=iPhone13%2C1&ef=1&eid=eidIc98d812270s8YJsI7x6OQ4SE/oNrRYKmoGCbCm002iJf1jMsFpgLxu2RGdxkRDEZNU1pWW0cvbGnPi%2Bhmydl%2BleT3quEAT%2B6VnQbdtggDOcLcrAx&ep=%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22screen%22%3A%22CJOyDIeyDNC2%22%2C%22wifiBssid%22%3A%22Y2GmDzC4CNZwCNTvEWDsCzUnEJLvCQCnDNCzYWUzD2Y%3D%22%2C%22osVersion%22%3A%22CJUkCM4y%22%2C%22area%22%3A%22CJTpEJK0XzumDV81CNYmCG%3D%3D%22%2C%22openudid%22%3A%22ZwTwDNS0DtKzDwS3CtYnY2Y2ZJHsCzLwYJYzDNC0ZtunCzTwZJVwZG%3D%3D%22%2C%22uuid%22%3A%22aQf1ZRdxb2r4ovZ1EJZhcxYlVNZSZz09%22%7D%2C%22ts%22%3A1646182804%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D&ext=%7B%22prstate%22%3A%220%22%2C%22pvcStu%22%3A%221%22%7D&isBackground=N&joycious=59&lang=zh_CN&networkType=wifi&networklibtype=JDNetworkBaseAF&partner=apple&rfs=0000&scope=11&sign=f6a8e443cbfaa923b43198d2bcd17fb1&st=1646183397713&sv=121&uemps=0-1&uts=0f31TVRjBSsqndu4/jgUPz6uymy50MQJu80uo1ZShhcKcFZypBzGgVDpmkYb1W4rFze3PpCU5%2B6Rvd6%2Birj7D/BTujC2L8axiZKoLG/12rGWzaPv/JTzN5Bh%2BYO7BaemwTBZpQeheEKggtsG9Ocln5eRb%2BvSDrSIUyifzdc55hQluvw3xFu5KnTwTiFscT%2BsGr5m4VaDQVApBp19Bfg5KA%3D%3D';
+			        let body1='body=%7B%22type%22%3A4%2C%22taskInfo%22%3A%2210042703455175%22%7D&build=167945&client=apple&clientVersion=10.3.4&d_brand=apple&d_model=iPhone13%2C1&ef=1&eid=eidIc98d812270s8YJsI7x6OQ4SE/oNrRYKmoGCbCm002iJf1jMsFpgLxu2RGdxkRDEZNU1pWW0cvbGnPi%2Bhmydl%2BleT3quEAT%2B6VnQbdtggDOcLcrAx&ep=%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22screen%22%3A%22CJOyDIeyDNC2%22%2C%22wifiBssid%22%3A%22Y2GmDzC4CNZwCNTvEWDsCzUnEJLvCQCnDNCzYWUzD2Y%3D%22%2C%22osVersion%22%3A%22CJUkCM4y%22%2C%22area%22%3A%22CJTpEJK0XzumDV81CNYmCG%3D%3D%22%2C%22openudid%22%3A%22ZwTwDNS0DtKzDwS3CtYnY2Y2ZJHsCzLwYJYzDNC0ZtunCzTwZJVwZG%3D%3D%22%2C%22uuid%22%3A%22aQf1ZRdxb2r4ovZ1EJZhcxYlVNZSZz09%22%7D%2C%22ts%22%3A1646182804%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D&ext=%7B%22prstate%22%3A%220%22%2C%22pvcStu%22%3A%221%22%7D&isBackground=N&joycious=59&lang=zh_CN&networkType=wifi&networklibtype=JDNetworkBaseAF&partner=apple&rfs=0000&scope=11&sign=02efd6eeaf4d5cf11a30f2ada5da7623&st=1646184136180&sv=111&uemps=0-1&uts=0f31TVRjBSsqndu4/jgUPz6uymy50MQJu80uo1ZShhcKcFZypBzGgVDpmkYb1W4rFze3PpCU5%2B6Rvd6%2Birj7D/BTujC2L8axiZKoLG/12rGWzaPv/JTzN5Bh%2BYO7BaemwTBZpQeheEKggtsG9Ocln5eRb%2BvSDrSIUyifzdc55hQluvw3xFu5KnTwTiFscT%2BsGr5m4VaDQVApBp19Bfg5KA%3D%3D';
+			        
+			             if(vo.doTimes < vo.times){
+    			           await doTask(body);
+    			           await $.wait(6000);
+    			           await doTask(body1);
+    			           await $.wait(6000);
+    			        }
+			    }
+			    if(vo.type===2){//逛商品
+    			    let body='body=%7B%22type%22%3A2%2C%22taskInfo%22%3A%221000408007%22%7D&build=167945&client=apple&clientVersion=10.3.4&d_brand=apple&d_model=iPhone13%2C1&ef=1&eid=eidIc98d812270s8YJsI7x6OQ4SE/oNrRYKmoGCbCm002iJf1jMsFpgLxu2RGdxkRDEZNU1pWW0cvbGnPi%2Bhmydl%2BleT3quEAT%2B6VnQbdtggDOcLcrAx&ep=%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22screen%22%3A%22CJOyDIeyDNC2%22%2C%22wifiBssid%22%3A%22Y2GmDzC4CNZwCNTvEWDsCzUnEJLvCQCnDNCzYWUzD2Y%3D%22%2C%22osVersion%22%3A%22CJUkCM4y%22%2C%22area%22%3A%22CJTpEJK0XzumDV81CNYmCG%3D%3D%22%2C%22openudid%22%3A%22ZwTwDNS0DtKzDwS3CtYnY2Y2ZJHsCzLwYJYzDNC0ZtunCzTwZJVwZG%3D%3D%22%2C%22uuid%22%3A%22aQf1ZRdxb2r4ovZ1EJZhcxYlVNZSZz09%22%7D%2C%22ts%22%3A1646182804%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D&ext=%7B%22prstate%22%3A%220%22%2C%22pvcStu%22%3A%221%22%7D&isBackground=N&joycious=59&lang=zh_CN&networkType=wifi&networklibtype=JDNetworkBaseAF&partner=apple&rfs=0000&scope=11&sign=27923887c84334ba1308f9386ce072e7&st=1646182836051&sv=100&uemps=0-1&uts=0f31TVRjBSsqndu4/jgUPz6uymy50MQJu80uo1ZShhcKcFZypBzGgVDpmkYb1W4rFze3PpCU5%2B6Rvd6%2Birj7D/BTujC2L8axiZKoLG/12rGWzaPv/JTzN5Bh%2BYO7BaemwTBZpQeheEKggtsG9Ocln5eRb%2BvSDrSIUyifzdc55hQluvw3xFu5KnTwTiFscT%2BsGr5m4VaDQVApBp19Bfg5KA%3D%3D';
+			        
+			         for (let ii = 0; ii < 2; ii++){
+			             if(vo.doTimes < vo.times){
+    			           await doTask(body);
+    			           await $.wait(6000);
+    			        }else{
+			            console.log(vo.name + `任务已完成`)
+			            break
 			        }
+			         }
 			    }
 			    if(vo.type===16){
-			        if(vo.doTimes < vo.times){
-			           let body='body=%7B%22type%22%3A16%2C%22taskInfo%22%3A%22https%3A%5C/%5C/pro.m.jd.com%5C/mall%5C/active%5C/3GZJACnxh9TajiEcBvkAMTm2MN7u%5C/index.html?babelChannel%3Dttt22%22%7D&build=167945&client=apple&clientVersion=10.3.4&d_brand=apple&d_model=iPhone13%2C1&ef=1&eid=eidIc98d812270s8YJsI7x6OQ4SE/oNrRYKmoGCbCm002iJf1jMsFpgLxu2RGdxkRDEZNU1pWW0cvbGnPi%2Bhmydl%2BleT3quEAT%2B6VnQbdtggDOcLcrAx&ep=%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22screen%22%3A%22CJOyDIeyDNC2%22%2C%22wifiBssid%22%3A%22Y2GmDzC4CNZwCNTvEWDsCzUnEJLvCQCnDNCzYWUzD2Y%3D%22%2C%22osVersion%22%3A%22CJUkCM4y%22%2C%22area%22%3A%22CJTpEJK0XzumDV81CNYmCG%3D%3D%22%2C%22openudid%22%3A%22ZwTwDNS0DtKzDwS3CtYnY2Y2ZJHsCzLwYJYzDNC0ZtunCzTwZJVwZG%3D%3D%22%2C%22uuid%22%3A%22aQf1ZRdxb2r4ovZ1EJZhcxYlVNZSZz09%22%7D%2C%22ts%22%3A1646096034%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D&ext=%7B%22prstate%22%3A%220%22%2C%22pvcStu%22%3A%221%22%7D&isBackground=N&joycious=59&lang=zh_CN&networkType=wifi&networklibtype=JDNetworkBaseAF&partner=apple&rfs=0000&scope=11&sign=30e4cc820e15224f442495766723a1f3&st=1646113957945&sv=102&uemps=0-1&uts=0f31TVRjBSsqndu4/jgUPz6uymy50MQJQK5a1ZM5c4AnvMg/N1eSzpgBG6HTznJvnzecGU5FVxAXmn/nR9zJLQvRVo0xxWwJaHWjLYByGcyB%2BNiYllicLPUbc8shJWAghQzzvkhe5xXmnBvW3rK5mhGl%2B2juxLxYAvwavtQ%2BX6Uvr6WfeNZHUOCiT1KZcHHy0yYMbWeHKEr6ZW7VV4tnkg%3D%3D';
-			           await doTask(body);
-			           await $.wait(6000);
-			           await doTask(body);
-			           await $.wait(6000);
+			         let body='body=%7B%22type%22%3A16%2C%22taskInfo%22%3A%22https%3A%5C/%5C/pro.m.jd.com%5C/mall%5C/active%5C/3GZJACnxh9TajiEcBvkAMTm2MN7u%5C/index.html?babelChannel%3Dttt22%22%7D&build=167945&client=apple&clientVersion=10.3.4&d_brand=apple&d_model=iPhone13%2C1&ef=1&eid=eidIc98d812270s8YJsI7x6OQ4SE/oNrRYKmoGCbCm002iJf1jMsFpgLxu2RGdxkRDEZNU1pWW0cvbGnPi%2Bhmydl%2BleT3quEAT%2B6VnQbdtggDOcLcrAx&ep=%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22screen%22%3A%22CJOyDIeyDNC2%22%2C%22wifiBssid%22%3A%22Y2GmDzC4CNZwCNTvEWDsCzUnEJLvCQCnDNCzYWUzD2Y%3D%22%2C%22osVersion%22%3A%22CJUkCM4y%22%2C%22area%22%3A%22CJTpEJK0XzumDV81CNYmCG%3D%3D%22%2C%22openudid%22%3A%22ZwTwDNS0DtKzDwS3CtYnY2Y2ZJHsCzLwYJYzDNC0ZtunCzTwZJVwZG%3D%3D%22%2C%22uuid%22%3A%22aQf1ZRdxb2r4ovZ1EJZhcxYlVNZSZz09%22%7D%2C%22ts%22%3A1646096034%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D&ext=%7B%22prstate%22%3A%220%22%2C%22pvcStu%22%3A%221%22%7D&isBackground=N&joycious=59&lang=zh_CN&networkType=wifi&networklibtype=JDNetworkBaseAF&partner=apple&rfs=0000&scope=11&sign=30e4cc820e15224f442495766723a1f3&st=1646113957945&sv=102&uemps=0-1&uts=0f31TVRjBSsqndu4/jgUPz6uymy50MQJQK5a1ZM5c4AnvMg/N1eSzpgBG6HTznJvnzecGU5FVxAXmn/nR9zJLQvRVo0xxWwJaHWjLYByGcyB%2BNiYllicLPUbc8shJWAghQzzvkhe5xXmnBvW3rK5mhGl%2B2juxLxYAvwavtQ%2BX6Uvr6WfeNZHUOCiT1KZcHHy0yYMbWeHKEr6ZW7VV4tnkg%3D%3D';
+			        for (let ii = 0; ii < 2; ii++){
+			            if(vo.doTimes < vo.times){
+    			           await doTask(body);
+    			           await $.wait(6000);
+    			        }else{
+			            console.log(vo.name + `任务已完成`)
+			            break
 			        }
+			        }
+			        
 			    }
 			    if(vo.type===17){
 			        if(vo.doTimes < vo.times){
@@ -65,6 +85,10 @@ if ($.isNode()) {
 			           await $.wait(6000);
 			           await doTask(body);
 			           await $.wait(6000);
+			           await doTask(body);
+			           await $.wait(6000);
+			        }else{
+			            console.log(vo.name + `任务已完成`)
 			        }
 			    }
 			}
@@ -132,8 +156,21 @@ function doTask(body={}) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     if (data) {
+                        //console.log(data)
                         data = JSON.parse(data);
-                        console.log(data)
+                        if (data.code===0){
+                            if(data.data.bizCode==105){
+                                console.log('活动太火爆啦')
+                            }
+                            if(data.data.bizCode==0){
+                                console.log(data.data.result.name + ' 执行任务成功')
+                            }
+                            if(data.data.bizCode==103){
+                                console.log(data.data.result.name + ' 任务已完成')
+                            }
+                        }
+                        
+                        
                     } else {
                         console.log(`服务器返回空数据`)
                     }
