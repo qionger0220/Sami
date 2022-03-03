@@ -31,7 +31,7 @@ let shareCodes = [];
         $.index = i + 1;
         $.nickName = '';
         let data = await requestApi('h5launch', helpNo(i));
-        //getSign()
+        getSign()
         if (data?.data?.result?.status == 1){
            console.log(`账号【${$.index}】火爆1`)
            continue;
