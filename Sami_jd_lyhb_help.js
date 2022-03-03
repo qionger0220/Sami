@@ -52,7 +52,7 @@ let shareCodes = [];
          }
     }
     await help();
-    await $.wait(5000);
+    await $.wait(50000);
 })()  .catch((e) => {
     $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
   })
