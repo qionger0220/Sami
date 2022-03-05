@@ -40,6 +40,7 @@ let shareCodes = [];
              shareCodes.push(data.data.result.redpacketInfo.id);
          }
     }
+    //console.log(cookiesArr)
     await help();
     await $.wait(5000);
 })()  .catch((e) => {
@@ -137,6 +138,7 @@ function requestApi(functionId, body = {}) {
         })
     })
 }
+
 
 
 function requireConfig() {
