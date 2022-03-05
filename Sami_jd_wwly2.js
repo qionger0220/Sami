@@ -235,7 +235,7 @@ if ($.isNode()) {
                                     console.log('汪汪购买失败:没有钱了！！');
                                     break;
                                 }
-                                
+                               
                                 
                             }
                         }
