@@ -2,7 +2,7 @@
 #
 京东极速App首页-汪汪乐园
  */
-const $ = new Env('Sami汪汪乐园');
+const $ = new Env('Sami汪汪乐园21-40');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 const notify = $.isNode() ? require('./sendNotify') : '';
