@@ -24,6 +24,7 @@ if ($.isNode()) {
         $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
         return;
     }
+    console.log("如果你遇到系统报错，请把执行时间增加下午时间点和晚上的时间点");
     await $.wait(1000);
     for (let i = 0; i < cookiesArr.length; i++) {
         cookie = cookiesArr[i];
