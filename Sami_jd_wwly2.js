@@ -158,22 +158,23 @@ if ($.isNode()) {
                          console.log('-->'+taskTitle + ':任务已完成');
                     }
                     
-                    if (id==483 && (taskDoTimes != 5 || taskDoTimes===null)){
+                    if (id==630 && (taskDoTimes != 5 || taskDoTimes===null)){
                       // console.log(taskTitle);
                       data = await gsh("apTaskDetail",id,"BROWSE_PRODUCT");
                       //console.log($.dataJson);
                       $.vo3=data;
                       if ($.vo3.success===true){
                           //taskItemList
+                          $.jc=taskDoTimes;
+                                if(taskDoTimes === null){
+                                    $.jc = 0;
+                                }
                             for (let vo3 of  $.vo3.data.taskItemList) {
                                 let itemId=vo3.itemId;
                                 let itemName=vo3.itemName;
                                 console.log('--------------------------------');
                                 console.log(itemName);
-                                $.jc=taskDoTimes;
-                                if(taskDoTimes === null){
-                                    $.jc = 0;
-                                }
+                                
                                 await apDoTask("apDoTask",id,itemId,"BROWSE_PRODUCT",taskTitle);
                                 if (data.success===false){
                                     console.log(`跳入下一个资源`)
@@ -195,7 +196,7 @@ if ($.isNode()) {
                                 
                             }
                       }
-                    }else if(id==483){
+                    }else if(id==630){
                          console.log('-->'+taskTitle + ':任务已完成');
                     }
                     
