@@ -1,6 +1,8 @@
 /*
 京东秒杀
 入口：[京东App京东秒杀]
+为了控制流量，请自定义执行时间，如果账号多，最好每小时执行一次。
+如有报错，请及时拉库
 */
 
 const $ = new Env("京东秒杀2022")
@@ -28,7 +30,7 @@ let shareCodes = [];
                 console.log('签到结果:'+result.result.assignmentResult.msg);
                 console.log('签到获得:🧧'+result.result.discountTotal+'元');
                 await SetsignRedPackage($.UserName1);
-                
+               
             }else if(data.code==2025){
                 console.log("签到活动：抱歉活动太火爆~");
             }
