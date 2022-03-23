@@ -144,7 +144,7 @@ let shareCodes = [];
                                 console.log('浏览15s即可得共'+vo.assignmentTimesLimit+'个,当前:'+vo.completionCnt+' '+data.msg)
                                 await $.wait(20000);
                                 data= await look15();
-                                console.log(data)
+                                //console.log(data)
                                 break;
                             }else{
                                $.Flag = true; 
@@ -186,7 +186,7 @@ let shareCodes = [];
                                 await $.wait(2000);
                                 getsignbody='functionId=doInteractiveAssignment&body={"extParam":{"businessData":{"random":"08534827"},"signStr":"'+data2.data+data2.data1+'","sceneid":"MShPageh5"},"encryptProjectId":"4Rxa9S9Vcgmq5zVtPJzNdFwpzsar","encryptAssignmentId":"48D123vRKRL6UyCUvJ8SBf9r6guP","itemId":"'+vo.ext.followShop[0].itemId+'","actionType":1,"sourceCode":"ace35880","completionFlag":"","ext":{}}&client=wh5&clientVersion=1.0.0&uuid=15985439329903714461101.432.1647852845429'
                                 data = await signRedPackage(getsignbody);
-                                console.log(data)
+                                //console.log(data)
                                 break;
                             }else{
                                $.Flag = true; 
@@ -350,7 +350,7 @@ function look15() {
             body: 'body=%7B%22dataSource%22%3A%22babelInteractive%22%2C%22method%22%3A%22customDoInteractiveAssignmentForBabel%22%2C%22reqParams%22%3A%22%7B%5C%22itemId%5C%22%3A%5C%221601428683%5C%22%2C%5C%22encryptProjectId%5C%22%3A%5C%224Rxa9S9Vcgmq5zVtPJzNdFwpzsar%5C%22%2C%5C%22encryptAssignmentId%5C%22%3A%5C%223CB3RTH3AWeLZrVSWgfwkrSSugYq%5C%22%7D%22%7D&build=167922&client=apple&clientVersion=10.3.2&d_brand=apple&d_model=iPhone10%2C2&ef=1&eid=eidI24d781231bs1iTGH8ZbsSEukVSdfFyjhN4kxiWXHSrYWZlESey1gWClSeNPIWaiskUd3%2BLUa%2But1VrRN3I/u4UbuOdicnjjwh/XZnMeBQx7EO/ZO&ep=%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22screen%22%3A%22CJS0CseyCtK4%22%2C%22area%22%3A%22CJTpEJK0XzumDV81CNYmCG%3D%3D%22%2C%22wifiBssid%22%3A%22ZtczCtKmYJCzDtY5ZNu4CWC1CQGmEJu4CNVwEQPuYwG%3D%22%2C%22osVersion%22%3A%22CJCkDq%3D%3D%22%2C%22uuid%22%3A%22aQf1ZRdxb2r4ovZ1EJZhcxYlVNZSZz09%22%2C%22adid%22%3A%22HUUnEJU1CJGjEJu2EM00DNLNBUO0CJujCUTNEJGnG0POCtO4%22%2C%22openudid%22%3A%22YtDrEWHvCQHrZJLsC2VtEQYmYtC5YtTtCJDtDJU3CzqmZJHtZtvsDG%3D%3D%22%7D%2C%22ts%22%3A1647852785%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D&ext=%7B%22prstate%22%3A%220%22%2C%22pvcStu%22%3A%221%22%7D&isBackground=N&joycious=84&lang=zh_CN&networkType=wifi&networklibtype=JDNetworkBaseAF&partner=apple&rfs=0000&scope=11&sign=67f4e40dad736f9f63d436234708e01b&st=1647872239136&sv=100&uemps=0-0&uts=0f31TVRjBSu/sZla2geQLFWY8lVsHG8bhnpCjfFXf6ozxb7VLc0EVC6uoUejCA5Lrfsu%2BEzD/EE8QvdT/29uZlCFHbXKPJYbMYSCBuMC/NoPSbHv0I/ZvPRUppcL62NaRLMYDYtDZ8kEcjGEqSpdbf11Pg8HRQHEFvE2GbtNUffX6AX5Z0W3BorfCTMw4NBGe03KDSL%2B8Kr6iSat1gZQUg%3D%3D'
         }, (_, resp, data) => {
             try {
-                console.log(data)
+                //console.log(data)
                 data = JSON.parse(data)
                 
             } catch (e) {
