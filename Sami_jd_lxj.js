@@ -6,7 +6,7 @@
 1、该脚本增加获取签名功能,如果担心风险,请禁用该脚本。
 2、建议大家每天执行5次以上且时间放到13:00以后
  */
-const $ = new Env('Sami领现金');
+const $ = new Env('领现金');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -36,35 +36,57 @@ if ($.isNode()) {
             $.isLogin = true;
             $.nickName = '';
             $.UserName1 =encodeURIComponent($.UserName)
+            $.flag1 = false;
             if (!$.isLogin) {
                 $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
                 continue
             }
             console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+            
+            //逛商品
+            $.flag1 = false;
+            for (let j=0; j<=20;j++){
+                if($.flag1 == true){
+                    break;
+                }
+                //console.log(j)
+                data = await homePage();
+                if(data.code===0){
+                    for (let vo of data.data.result.taskInfos){
+                        if(vo.type===4){ //逛商品
+                            getSign=await getBodySign(vo.desc, $.UserName1)
+                        //console.log(getSign)
+                        //await (60000)
+                            if (getSign.code === 100){
+                                if(vo.doTimes < vo.times){
+                			        await doTask(getSign.data);
+                			        await $.wait(6000);
+                			        $.flag1=false;
+            			        }else{
+            			            console.log('🐷逛商品任务已完成')
+            			            $.flag1 =true;
+            			        }
+                            }else{
+                                console.log(vo.desc+'无可用签名,请稍后重试')
+                                $.flag1 =true;
+                            }
+        			         if(vo.finishFlag===1){
+        			             console.log('🐷逛商品任务已完成')
+        			             $.flag1 =true;
+        			         }
+                        }
+                        
+                    }
+                }
+            }
+            
+            
             //做任务
             data = await homePage();
             //console.log(data)
             if(data.code===0){
                 console.log('📣助力码：'+data.data.result.invitedCode)
                 for (let vo of data.data.result.taskInfos){
-
-                    if(vo.type===4){ //逛商品
-                         getSign=await getBodySign(vo.desc, $.UserName1)
-                          if (getSign.code === 100){
-                              if(vo.doTimes < vo.times){
-            			           await doTask(getSign.data);
-            			           await $.wait(6000);
-        			           }else{
-        			               console.log('🐷逛商品任务已完成')
-        			           }
-                          }else{
-                              console.log('无可用签名,请稍后重试')
-                          }
-			             
-    			         if(vo.finishFlag===1){
-    			             console.log('🐷逛商品任务已完成')
-    			         }
-                    }
                     if(vo.type===2){ //逛店铺
                          getSign=await getBodySign(vo.desc, $.UserName1)
                           if (getSign.code === 100){
@@ -75,7 +97,7 @@ if ($.isNode()) {
         			               console.log('🐷逛店铺任务已完成')
         			           }
                           }else{
-                              console.log('无可用签名,请稍后重试')
+                              console.log(vo.desc+'无可用签名,请稍后重试')
                           }
 			             
     			         if(vo.finishFlag===1){
