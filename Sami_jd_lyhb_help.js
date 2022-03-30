@@ -190,53 +190,7 @@ async function OpenRedEnvelopes(index){
 
 
 
-/*
-function getBodySign(redPacketId,i,UserName){
-     return new Promise(resolve => {
-        $.get({
-            url:`http://199.101.171.13:1880/jinli_h5assist?redPacketId=${redPacketId}&i=${i}`,
-            headers: {
-                "Cookie": cookie,
-                "pt_pin": UserName,
-                "User-Agent": ua
-            },
-        }, (_, resp, data) => {
-            try {
-                data = JSON.parse(data)
-            } catch (e) {
-                $.logErr('Error: ', e, resp)
-            } finally {
-                resolve(data)
-            }
-        })
-    })
-}
 
-function setHelpStatus(UserName){
-     return new Promise(resolve => {
-        $.get({
-            url:`http://199.101.171.13:1880/setjinli_h5assist`,
-            headers: {
-                "pt_pin": UserName,
-                "User-Agent": ua
-            },
-        }, (_, resp, data) => {
-            try {
-                data = JSON.parse(data)
-                
-            } catch (e) {
-                $.logErr('Error: ', e, resp)
-            } finally {
-                resolve(data)
-            }
-        })
-    })
-}
-
-function hb(){
-    return 'body=%7B%22random%22%3A%2256828511%22%2C%22log%22%3A%221647133691611~1QLkKClp2omMDF2UmRnZjAyMQ%3D%3D.R2RQUFdFYVJQV0RmURkLRxZUC1U0Cw0JGEd%2BUktQWmMaVRhHLBMhCzs3EFBSDxZSFxcpMRYuLxc0VyQnCA%3D%3D.52dfd4d7~6%2C1~DBC3A45FC9AD7EDA8EEDDC2EC95388E32CCF6965~1vkdld9~C~ThtBVRAPbRRUAxQMCh4MfRp8fmNyeh5UGkISGRtRDh8MDhoJfhV5c2hyehpRGU0XFBBRABsJfRUMch55fWx3YhVUFEYXGhRUAxQMdx4Mfxp8fmN9Dx5UGkISaBUXTFxYFAxrF10AFQQHGnEIGXV5eQsAGlccQRsZGlYCGwACGX4NFH55d3UCGVgZTBAZFFIBGA8GFHUMGnp8dHwAFEcZQhRtGRtSSlwXDAQcF0pGGggXBwAEAgkMDwYHAAQCBQ0MCgAXGhRHUF0XAhBBQkJEQV9AXhAZFEFVVBsPGlRTQkJEQUxUGh4XRlJeFwNuDB4DDgMcDBUECB4EGgNtGRtfUhAPBRoSVkoXAhAMUlIGUQ9WAQQCBlVVV1oEWwtQBFBTBw4MDwsEDlRWDRsZGlxFFAwSXGldV1xQFBoSQRsPCQQBAQcDBg8MCQQEBxoSX1IXAhBXBVcJUVwFXFNQBlQDUFoNXgJXBQ9SB1oEC1EAAwEDDQlQDFFTD1QFFxUXXkJXFAwSQn9YdVdBAQJJcQ9FSW1WRH95VF8Ge3MXGhReQxsPGnNFRlpVFXpaVUJAQlNCGRl8VlEbFBoSW1hDGggXBwAHDAsHGh4XRVVCFwNuDwEDGgIBAWQZGkBaFAxrF1BlUF1bUwcAGQsXFBBceWUSGRsECxwDFBoSBAkbCxwHFBoSBA8CAQAHFBoSVwpUAVZQBlJRUAlXC1dWDlAAVwoMWgBWBwVTAAwCCwoFUwJTUwBXDRAZFFcSaBUXUV1UFAwSU19TXlRTQkISGRtUUhAPFEMSGRtWURAPFEEDGwsbDBAZFFVWak8XAhAFBBQcF1tRGggXRFdeUVZYBQcDDgQIAAgEGh4XW1wSD2ICFAMEGgJtGRtXVF1SFAwSBA8BDwIMAQICAQwECEwEcVJHc3ZGX31afHt0c1RjbQtfV3JxTXd0BQ8bYAR%2BAm9zUFdsfgdiYlVvU1d3Bnl%2BWHB5bXQNXXteVgxzUHAAeGMJdmpYaUpjZGxofkABcn50XWx6XG9kaHENbmNZZ3NsakV9fFxlXnpkS1t0TEFTeVNeUXtCd3V9dncDcktebHwCBVB7QVllZmJTXX10dQp%2BX2BRdH1WE3R0Y2J3fQ1%2FeUp0WHBJBVJ0e3t4e14ITHVtTwJiZ3tnegh7WXtMb315WW9Xc0UICxgCA1wFXVcBD0hHGQhLRkx3SGJyUWFtUGd6cAdhcn5kbWpydGRicGhBfXF3fHliUlF2fkUFYHBIUm9kQGtlcGd1dntSbWVyXnRhY0NeYHdZXnFmZHRtf0pjfnBXBW9zUFljbnNlY31NYXV9UXtyY1Vwa2Zeb3N1dAFjfmdSC0gAAQhZDgtDFBoSWEpSGggXFEs%3D~1q344el%22%2C%22sceneid%22%3A%22JLHBhPageh5%22%7D'
-}
-*/
 
 
 function requireConfig() {
