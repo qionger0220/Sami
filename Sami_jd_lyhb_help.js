@@ -9,7 +9,7 @@
 */
 
 const $ = new Env("Sami锦鲤红包互助")
-const Ver = '20220331';
+const Ver = '20220401';
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 const ua = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random()*4+10)}.${Math.ceil(Math.random()*4)};${randomString(40)}`
 let cookiesArr = [], cookie = '';
@@ -147,8 +147,6 @@ function requestApi1(functionId,body) {
     })
 }
 
-
-
 async function OpenRedEnvelopes(index){
     console.log(`\n******开始开红包******\n`);
     try {
@@ -167,12 +165,24 @@ async function OpenRedEnvelopes(index){
                     //发现可拆红包，开始拆了
                     console.log("  发现可拆红包");
                     //cookie = cookiesArr[i]
-                    data = await requestApi1('h5receiveRedpacketAll', hb());
+                    let helpNo = await  getBodySign("h5receiveRedpacketAll");
+                    if(helpNo===100){
+                        let data = await requestApi('h5receiveRedpacketAll');
+                        //console.log(data)
+                        if(data.code===0){
+                            console.log("  拆到红包金额："+data.data.biz_msg+"-》"+data.data.result.discount);
+                        }else{
+                            console.log("  拆红包失败");
+                        }
+                       
+                    }
+                    
+                    /*data = await requestApi1('h5receiveRedpacketAll', hb());
                     if(data.code===0){
                         console.log("  拆到红包金额："+data.data.biz_msg+"-》"+data.data.result.discount);
                     }else{
                         console.log("  拆红包失败");
-                    }
+                    }*/
                     await $.wait(5000);
                 }else if(vo.packetStatus===2){
                     //已经拆过红包了
