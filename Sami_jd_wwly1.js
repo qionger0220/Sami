@@ -136,6 +136,15 @@ if ($.isNode()) {
                          console.log('-->'+taskTitle + ':任务已完成');
                     }
                     
+                    if (id==662 && (taskDoTimes==0 || taskDoTimes===null)){
+                       let data = await apDoTask("apDoTask",id,encodeURIComponent(vo.taskSourceUrl),"BROWSE_CHANNEL",taskTitle);
+                       console.log(data)
+                       await $.wait(4000);
+                       await eveDayChack("apTaskDrawAward",id,"BROWSE_CHANNEL",taskTitle);
+                    }else if(id==662){
+                         console.log('-->'+taskTitle + ':任务已完成');
+                    }
+                    
                     if (id==481 && (taskDoTimes != 5 || taskDoTimes===null)){
                       //console.log(taskTitle);
                       data = await gsh("apTaskDetail",id,"BROWSE_CHANNEL");
