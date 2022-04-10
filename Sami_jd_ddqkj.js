@@ -47,8 +47,7 @@ let helpno = "",UUID="",flag1=false,activitykey="",datastr="";
        
     }
     
-    
-    await $.wait(200000);
+  
 })()  .catch((e) => {
     $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
   })
