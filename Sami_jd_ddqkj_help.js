@@ -24,7 +24,7 @@ let helpno = "",UUID="",flag1=false,activitykey="",datastr="";
     await instructions()
     await $.wait(2000);    
    
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < cookiesArr.length; i++) {
         cookie = cookiesArr[i]
         $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
         $.index = i + 1;
