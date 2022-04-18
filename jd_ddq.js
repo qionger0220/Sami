@@ -7,7 +7,7 @@
 */
 
 const $ = new Env("点点券2022")
-const Ver = '20220408';
+const Ver = '20220418';
 const ua = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random()*4+10)}.${Math.ceil(Math.random()*4)};${randomString(40)}`
 let cookiesArr = [], cookie = '';
 let shareCodes = [];
