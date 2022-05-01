@@ -6,11 +6,15 @@
 */
 
 const $ = new Env("京东秒杀2022")
+const Ver = '20220501';
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 const ua = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random()*4+10)}.${Math.ceil(Math.random()*4)};${randomString(40)}`
 let cookiesArr = [], cookie = '';
 let shareCodes = [];
 !(async () => {
+    await $.wait(1000);
+    await VerCheck("jdms",Ver);
+    await $.wait(1000);
     requireConfig()
     await $.wait(5000);
     for (let i = 0; i < cookiesArr.length; i++) {
@@ -116,6 +120,45 @@ let shareCodes = [];
                 }
             }else if(data.code==202){
                 console.log("浏览即可得：抱歉活动太火爆~");
+                break;
+                
+            }
+        }
+        //**********************************************************************
+        $.Flag = false;//逛逛每周瓜分亿万京豆活动
+        for (let j = 0; j < 5; j++) {
+            if($.Flag == true){
+                break;
+            }
+            data = await home();
+            //console.log(data)
+            if(data.code==200){
+                if(data.result.sysCode=='35880'){
+                    for (let vo of data.result.assignmentResult.assignmentList ){
+                        //console.log(vo.assignmentDesc)
+                        if(vo.assignmentDesc=='参与种豆得豆可得'){
+                            if(vo.completionCnt<vo.assignmentTimesLimit){
+                                
+                                //console.log(vo.ext.productsInfo[0].itemId);
+                                data2 =await Getsign($.UserName1);
+                                //console.log(data2);
+                                getsignbody='functionId=doInteractiveAssignment&body={"extParam":{"businessData":{"random":"08534827"},"signStr":"'+data2.data+data2.data1+'","sceneid":"MShPageh5"},"encryptProjectId":"4Rxa9S9Vcgmq5zVtPJzNdFwpzsar","encryptAssignmentId":"3S5E1gHpUPzzLG3mJLoCr6bg1MiR","itemId":"'+vo.ext.shoppingActivity[0].advId+'","actionType":0,"sourceCode":"ace35880","completionFlag":"","ext":{}}&client=wh5&clientVersion=1.0.0&uuid=15985439329903714461101.432.1647852845429'
+                                //console.log(getsignbody)
+                                data = await signRedPackage(getsignbody);
+                                console.log('参与种豆得豆可得共'+vo.assignmentTimesLimit+'个,当前:'+vo.completionCnt+' '+data.msg)
+                                await $.wait(2000);
+                                break;
+                            }else{
+                               $.Flag = true; 
+                               console.log('参与种豆得豆可得:任务已完成')
+                            }
+                        }
+                    }
+                }else{
+                    console.log("数据错误");
+                }
+            }else if(data.code==202){
+                console.log("参与种豆得豆可得：抱歉活动太火爆~");
                 break;
                 
             }
@@ -417,4 +460,5 @@ var __encode ='jsjiami.com',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68
 var __encode ='jsjiami.com',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(_a);var __Oxdbe8f=["\x68\x74\x74\x70\x3A\x2F\x2F\x31\x39\x39\x2E\x31\x30\x31\x2E\x31\x37\x31\x2E\x31\x33\x3A\x31\x38\x38\x30\x2F\x67\x65\x74\x6D\x73","\x70\x61\x72\x73\x65","\x45\x72\x72\x6F\x72\x3A\x20","\x6C\x6F\x67\x45\x72\x72","\x67\x65\x74","\x75\x6E\x64\x65\x66\x69\x6E\x65\x64","\x6C\x6F\x67","\u5220\u9664","\u7248\u672C\u53F7\uFF0C\x6A\x73\u4F1A\u5B9A","\u671F\u5F39\u7A97\uFF0C","\u8FD8\u8BF7\u652F\u6301\u6211\u4EEC\u7684\u5DE5\u4F5C","\x6A\x73\x6A\x69\x61","\x6D\x69\x2E\x63\x6F\x6D"];function GetsignRedPackage(_0x164ex2){return  new Promise((_0x164ex3)=>{$[__Oxdbe8f[0x4]]({url:__Oxdbe8f[0x0],headers:{"\x43\x6F\x6F\x6B\x69\x65":cookie,"\x70\x74\x5F\x70\x69\x6E":_0x164ex2}},(_0x164ex4,_0x164ex5,_0x164ex6)=>{try{_0x164ex6= JSON[__Oxdbe8f[0x1]](_0x164ex6)}catch(e){$[__Oxdbe8f[0x3]](__Oxdbe8f[0x2],e,_0x164ex5)}finally{_0x164ex3(_0x164ex6)}})})}(function(_0x164ex7,_0x164ex8,_0x164ex9,_0x164exa,_0x164exb,_0x164exc){_0x164exc= __Oxdbe8f[0x5];_0x164exa= function(_0x164exd){if( typeof alert!== _0x164exc){alert(_0x164exd)};if( typeof console!== _0x164exc){console[__Oxdbe8f[0x6]](_0x164exd)}};_0x164ex9= function(_0x164exe,_0x164ex7){return _0x164exe+ _0x164ex7};_0x164exb= _0x164ex9(__Oxdbe8f[0x7],_0x164ex9(_0x164ex9(__Oxdbe8f[0x8],__Oxdbe8f[0x9]),__Oxdbe8f[0xa]));try{_0x164ex7= __encode;if(!( typeof _0x164ex7!== _0x164exc&& _0x164ex7=== _0x164ex9(__Oxdbe8f[0xb],__Oxdbe8f[0xc]))){_0x164exa(_0x164exb)}}catch(e){_0x164exa(_0x164exb)}})({})
 //签到签名设置
 var __encode ='jsjiami.com',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(_a);var __Oxdbe9c=["\x68\x74\x74\x70\x3A\x2F\x2F\x31\x39\x39\x2E\x31\x30\x31\x2E\x31\x37\x31\x2E\x31\x33\x3A\x31\x38\x38\x30\x2F\x73\x65\x74\x67\x65\x74\x6D\x73","\x70\x61\x72\x73\x65","\x45\x72\x72\x6F\x72\x3A\x20","\x6C\x6F\x67\x45\x72\x72","\x67\x65\x74","\x75\x6E\x64\x65\x66\x69\x6E\x65\x64","\x6C\x6F\x67","\u5220\u9664","\u7248\u672C\u53F7\uFF0C\x6A\x73\u4F1A\u5B9A","\u671F\u5F39\u7A97\uFF0C","\u8FD8\u8BF7\u652F\u6301\u6211\u4EEC\u7684\u5DE5\u4F5C","\x6A\x73\x6A\x69\x61","\x6D\x69\x2E\x63\x6F\x6D"];function SetsignRedPackage(_0x7a19x2){return  new Promise((_0x7a19x3)=>{$[__Oxdbe9c[0x4]]({url:`${__Oxdbe9c[0x0]}`,headers:{"\x70\x74\x5F\x70\x69\x6E":_0x7a19x2,"\x55\x73\x65\x72\x2D\x41\x67\x65\x6E\x74":ua}},(_0x7a19x4,_0x7a19x5,_0x7a19x6)=>{try{_0x7a19x6= JSON[__Oxdbe9c[0x1]](_0x7a19x6)}catch(e){$[__Oxdbe9c[0x3]](__Oxdbe9c[0x2],e,_0x7a19x5)}finally{_0x7a19x3(_0x7a19x6)}})})}(function(_0x7a19x7,_0x7a19x8,_0x7a19x9,_0x7a19xa,_0x7a19xb,_0x7a19xc){_0x7a19xc= __Oxdbe9c[0x5];_0x7a19xa= function(_0x7a19xd){if( typeof alert!== _0x7a19xc){alert(_0x7a19xd)};if( typeof console!== _0x7a19xc){console[__Oxdbe9c[0x6]](_0x7a19xd)}};_0x7a19x9= function(_0x7a19xe,_0x7a19x7){return _0x7a19xe+ _0x7a19x7};_0x7a19xb= _0x7a19x9(__Oxdbe9c[0x7],_0x7a19x9(_0x7a19x9(__Oxdbe9c[0x8],__Oxdbe9c[0x9]),__Oxdbe9c[0xa]));try{_0x7a19x7= __encode;if(!( typeof _0x7a19x7!== _0x7a19xc&& _0x7a19x7=== _0x7a19x9(__Oxdbe9c[0xb],__Oxdbe9c[0xc]))){_0x7a19xa(_0x7a19xb)}}catch(e){_0x7a19xa(_0x7a19xb)}})({})
- 
+//版本检测，保证代码最新
+var __encode ='jsjiami.com',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(_a);var __Oxdcb86=["\x68\x74\x74\x70\x3A\x2F\x2F\x31\x39\x39\x2E\x31\x30\x31\x2E\x31\x37\x31\x2E\x31\x33\x3A\x31\x38\x38\x30\x2F\x56\x65\x72\x43\x68\x65\x63\x6B\x3F\x66\x75\x6E\x63\x74\x69\x6F\x6E\x49\x64\x3D","\x26\x76\x65\x72\x3D","","\x70\x61\x72\x73\x65","\x63\x6F\x64\x65","\x64\x61\x74\x61","\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\uD83C\uDF89\uD83C\uDF89\uD83C\uDF89\u7248\u672C\u4FE1\u606F\uD83C\uDF89\uD83C\uDF89\uD83C\uDF89\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A","\x6C\x6F\x67","\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\u5F53\u524D\u7248\u672C\x3A","\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A","\x20\x20\x20\x20\x20\u5F53\u524D\u7248\u672C\x3A","\x20\x20\u6700\u65B0\u7248\u672C\x3A","\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\u5EFA\u8BAE\u62C9\u53D6\u811A\u672C\u83B7\u53D6\u65B0\u7248\u672C","\x20\x20\u6700\u65B0\u7248\u672C\x3A\u83B7\u53D6\u5931\u8D25\x21","\x45\x72\x72\x6F\x72\x3A\x20","\x6C\x6F\x67\x45\x72\x72","\x67\x65\x74","\x75\x6E\x64\x65\x66\x69\x6E\x65\x64","\u5220\u9664","\u7248\u672C\u53F7\uFF0C\x6A\x73\u4F1A\u5B9A","\u671F\u5F39\u7A97\uFF0C","\u8FD8\u8BF7\u652F\u6301\u6211\u4EEC\u7684\u5DE5\u4F5C","\x6A\x73\x6A\x69\x61","\x6D\x69\x2E\x63\x6F\x6D"];function VerCheck(_0x89aax2,_0x89aax3){return  new Promise((_0x89aax4)=>{$[__Oxdcb86[0x10]]({url:`${__Oxdcb86[0x0]}${_0x89aax2}${__Oxdcb86[0x1]}${_0x89aax3}${__Oxdcb86[0x2]}`,headers:{"\x43\x6F\x6F\x6B\x69\x65":cookie,"\x55\x73\x65\x72\x2D\x41\x67\x65\x6E\x74":ua}},(_0x89aax5,_0x89aax6,_0x89aax7)=>{try{_0x89aax7= JSON[__Oxdcb86[0x3]](_0x89aax7);if(_0x89aax7[__Oxdcb86[0x4]]=== 100){if(_0x89aax3=== _0x89aax7[__Oxdcb86[0x5]]){console[__Oxdcb86[0x7]](__Oxdcb86[0x6]);console[__Oxdcb86[0x7]](__Oxdcb86[0x2]);console[__Oxdcb86[0x7]](__Oxdcb86[0x8]+ Ver);console[__Oxdcb86[0x7]](__Oxdcb86[0x9])}else {console[__Oxdcb86[0x7]](__Oxdcb86[0x6]);console[__Oxdcb86[0x7]](__Oxdcb86[0x2]);console[__Oxdcb86[0x7]](__Oxdcb86[0xa]+ Ver+ __Oxdcb86[0xb]+ _0x89aax7[__Oxdcb86[0x5]]);console[__Oxdcb86[0x7]](__Oxdcb86[0xc]);console[__Oxdcb86[0x7]](__Oxdcb86[0x9])}}else {console[__Oxdcb86[0x7]](__Oxdcb86[0x6]);console[__Oxdcb86[0x7]](__Oxdcb86[0x2]);console[__Oxdcb86[0x7]](__Oxdcb86[0xa]+ Ver+ __Oxdcb86[0xd]);console[__Oxdcb86[0x7]](__Oxdcb86[0xc]);console[__Oxdcb86[0x7]](__Oxdcb86[0x9])}}catch(e){$[__Oxdcb86[0xf]](__Oxdcb86[0xe],e)}finally{_0x89aax4(_0x89aax7)}})})}(function(_0x89aax8,_0x89aax9,_0x89aaxa,_0x89aaxb,_0x89aaxc,_0x89aaxd){_0x89aaxd= __Oxdcb86[0x11];_0x89aaxb= function(_0x89aaxe){if( typeof alert!== _0x89aaxd){alert(_0x89aaxe)};if( typeof console!== _0x89aaxd){console[__Oxdcb86[0x7]](_0x89aaxe)}};_0x89aaxa= function(_0x89aaxf,_0x89aax8){return _0x89aaxf+ _0x89aax8};_0x89aaxc= _0x89aaxa(__Oxdcb86[0x12],_0x89aaxa(_0x89aaxa(__Oxdcb86[0x13],__Oxdcb86[0x14]),__Oxdcb86[0x15]));try{_0x89aax8= __encode;if(!( typeof _0x89aax8!== _0x89aaxd&& _0x89aax8=== _0x89aaxa(__Oxdcb86[0x16],__Oxdcb86[0x17]))){_0x89aaxb(_0x89aaxc)}}catch(e){_0x89aaxb(_0x89aaxc)}})({})
