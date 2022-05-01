@@ -18,7 +18,7 @@ if ($.isNode()) {
 } else {
     cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
-
+console.log(`目前有部分账号无法自动做任务了，并提示被风控了，经测试并不是被风控，只是游戏进行了加密，目前解密还有些难度，待解密后就可以恢复，请及时拉脚本，获取最新的脚本 `);
 !(async () => {
     if (!cookiesArr[0]) {
         $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
