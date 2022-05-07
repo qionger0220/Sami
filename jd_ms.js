@@ -6,7 +6,7 @@
 */
 
 const $ = new Env("京东秒杀2022")
-const Ver = '20220501';
+const Ver = '20220507';
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 const ua = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random()*4+10)}.${Math.ceil(Math.random()*4)};${randomString(40)}`
 let cookiesArr = [], cookie = '';
@@ -142,7 +142,7 @@ let shareCodes = [];
                                 //console.log(vo.ext.productsInfo[0].itemId);
                                 data2 =await Getsign($.UserName1);
                                 //console.log(data2);
-                                getsignbody='functionId=doInteractiveAssignment&body={"extParam":{"businessData":{"random":"08534827"},"signStr":"'+data2.data+data2.data1+'","sceneid":"MShPageh5"},"encryptProjectId":"4Rxa9S9Vcgmq5zVtPJzNdFwpzsar","encryptAssignmentId":"3S5E1gHpUPzzLG3mJLoCr6bg1MiR","itemId":"'+vo.ext.shoppingActivity[0].advId+'","actionType":0,"sourceCode":"ace35880","completionFlag":"","ext":{}}&client=wh5&clientVersion=1.0.0&uuid=15985439329903714461101.432.1647852845429'
+                                getsignbody='functionId=doInteractiveAssignment&body={"extParam":{"businessData":{"random":"08534827"},"signStr":"'+data2.data+data2.data1+'","sceneid":"MShPageh5"},"encryptProjectId":"4Rxa9S9Vcgmq5zVtPJzNdFwpzsar","encryptAssignmentId":"'+vo.encryptAssignmentId+'","itemId":"'+vo.ext.shoppingActivity[0].advId+'","actionType":0,"sourceCode":"ace35880","completionFlag":"","ext":{}}&client=wh5&clientVersion=1.0.0&uuid=15985439329903714461101.432.1647852845429'
                                 //console.log(getsignbody)
                                 data = await signRedPackage(getsignbody);
                                 console.log('参与种豆得豆可得共'+vo.assignmentTimesLimit+'个,当前:'+vo.completionCnt+' '+data.msg)
