@@ -42,7 +42,6 @@ let shareCodes = [];
                //汪汪下工位
                t2 = Date.now();
                h5st = await GetInfo(`joyMove`,t2,`{"joyId":`+joyDTOID+`,"location":0,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`8914487521916936`,`50788`,`1`,$.UserName1);
-               console.log(encodeURIComponent(h5st))
                data= await PostTask("joyMove",`{"joyId":`+joyDTOID+`,"location":0,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,t2,encodeURIComponent(h5st))
                if (data.code === 0){
                    if (data.errMsg === 'success'){
@@ -204,7 +203,7 @@ let shareCodes = [];
             //购买汪汪
             t2 = Date.now();
             h5st = await GetInfo(`joyBaseInfo`,t2,`{"taskId":"","inviteType":"","inviterPin":"","linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`8914487521916936`,`50788`,`1`,$.UserName1);
-            console.log(encodeURIComponent(h5st))
+
             data= await PostTask("joyBaseInfo",`{"taskId":"","inviteType":"","inviterPin":"","linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,t2,encodeURIComponent(h5st))
             if(data.code===0){
                 if(data.data.level===30){
