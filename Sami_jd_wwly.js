@@ -353,6 +353,10 @@ let shareCodes = [];
                         h5st = await GetInfo(`joyList`,t1,`{"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`6237189232500324`,`e18ed`,`0`,$.UserName1);
                         data= await GetTask("joyList",encodeURIComponent(`{"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`),t1,encodeURIComponent(h5st))
                         await $.wait(5000);
+                        if(data.code != 0){
+                            console.log('该账号的活动异常，请登录手机查看是否正常！！')
+                            continue;
+                        }
                         data.data.activityJoyList=sortByKey( data.data.activityJoyList,"level");
                     }
                     break;
