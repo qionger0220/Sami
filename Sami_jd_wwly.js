@@ -4,8 +4,8 @@
 15 6,10,14,19,21 * * * Sami_jd_wwly.js
 由于程序频繁提交JDAPI，导致游戏出现“火爆”现象,本自用程序已经解决次问题。
  */
-const $ = new Env("Sami汪汪乐园2022")
-const Ver = '20220510';
+const $ = new Env("Sami汪汪乐园1-20")
+const Ver = '20220513';
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 const ua = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random()*4+10)}.${Math.ceil(Math.random()*4)};${randomString(40)}`
 let cookiesArr = [], cookie = '';
