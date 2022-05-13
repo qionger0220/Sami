@@ -16,7 +16,7 @@ let shareCodes = [];
     await $.wait(1000);
     requireConfig()
     await $.wait(5000);
-    for (let i = 10; i < cookiesArr.length; i++) {
+    for (let i = 0; i < cookiesArr.length; i++) {
         cookie = cookiesArr[i]
         $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
         $.index = i + 1;
