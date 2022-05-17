@@ -76,14 +76,14 @@ async function ldrw(){
                     if(vo.displayOrder===3){
                         //获取签名并领取任务taskStage=0 任务未领 taskStage=1 任务已领  taskStage=2 已经完成
                         if(vo.taskStage ===0){
-                            await getBodySign('startTask','445',$.UserName1);
+                            await getBodySign('startTask',vo.id,$.UserName1);
                             //console.log(helpno);
                             data1=await startTask("necklace_startTask",UUID)
                             console.log("📮"+vo.taskName+"->"+data1.data?.biz_msg+"✔✔✔")
                             //console.log(JSON.stringify(data1));
                         }
                         if(vo.taskStage ===1){
-                            data = await GetAllTask("necklace_getTask",UUID,"","body=%7B%22taskId%22%3A445%7D");
+                            data = await GetAllTask("necklace_getTask",UUID,"","body=%7B%22taskId%22%3A"+vo.id+"%7D");
                             //console.log("11111111111111111"+JSON.stringify(data))
                             for (let vo1 of data.data?.result?.taskItems){
                                 //console.log(vo1.id+'->'+vo1.title+'->'+vo1.status);
@@ -91,9 +91,9 @@ async function ldrw(){
                                     console.log("🥇"+vo.taskName+"-"+vo1.title+"->任务已经完成啦✔✔✔")
                                 }
                                 if(vo1.status===0){
-                                    data2 = await GetAllTask("necklace_timedTask",UUID,"","body=%7B%22taskId%22%3A445%2C%22itemId%22%3A%22"+vo1.id+"%22%7D");
+                                    data2 = await GetAllTask("necklace_timedTask",UUID,"","body=%7B%22taskId%22%3A"+vo.id+"%2C%22itemId%22%3A%22"+vo1.id+"%22%7D");
                                     await $.wait(5000);
-                                    data2 = await GetAllTask("necklace_reportTask",UUID,"","body=%7B%22taskId%22%3A445%2C%22itemId%22%3A%22"+vo1.id+"%22%7D");
+                                    data2 = await GetAllTask("necklace_reportTask",UUID,"","body=%7B%22taskId%22%3A"+vo.id+"%2C%22itemId%22%3A%22"+vo1.id+"%22%7D");
                                     
                                     if(data2!=''){
                                         console.log("🔊🔊🔊"+vo.taskName+'->'+vo1.title+"->"+data2.data.biz_msg )
@@ -111,7 +111,7 @@ async function ldrw(){
                         data2 = await GetAllTask("necklace_newHomePage",UUID,"&client=ios&clientVersion=10.4.6&build=168014&partner=&rfs=0000","body=%7B%7D");
                         //console.log("11111111111111111"+JSON.stringify(data2))
                         for (let vo3 of data2.data?.result?.bubbles){
-                            if(vo3.taskConfigId===445){
+                            if(vo3.taskConfigId===vo.id){
                                 await getBodySign('necklace_chargeScores',vo3.id,$.UserName1);
                                 data4=await startTask("necklace_chargeScores",UUID)
                                 console.log("🧧"+vo.taskName+"->红包开出"+data4.data?.result?.giftScoreNum+"积分.")
