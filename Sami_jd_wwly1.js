@@ -5,7 +5,7 @@
 由于程序频繁提交JDAPI，导致游戏出现“火爆”现象,本自用程序已经解决次问题。
  */
 const $ = new Env("Sami汪汪乐园20-40")
-const Ver = '20220513';
+const Ver = '20220616';
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 const ua = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random()*4+10)}.${Math.ceil(Math.random()*4)};${randomString(40)}`
 let cookiesArr = [], cookie = '';
@@ -156,7 +156,7 @@ let shareCodes = [];
                 console.log('-->'+taskTitle + ':任务已完成');
             }
             //***************************************************************         
-            if (id==481 && (taskDoTimes != 5 || taskDoTimes===null)){
+            if (id==810 && (taskDoTimes != 5 || taskDoTimes===null)){
               //console.log(taskTitle);
               data = await gsh("apTaskDetail",id,"BROWSE_CHANNEL");
               //console.log($.dataJson);
